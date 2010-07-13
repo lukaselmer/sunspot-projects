@@ -73,6 +73,7 @@ public class SimpleHost implements Runnable {
 
     public void run() {
         while (true) {
+            System.out.println("");
             System.out.println("---");
             System.out.println("" + clients.size() + " clients connected.");
             for (int i = 0; i < clients.size(); i++) {
@@ -80,6 +81,7 @@ public class SimpleHost implements Runnable {
                 System.out.println("Client " + i + ": " + client);
             }
             System.out.println("---");
+            System.out.println("");
             Utils.sleep(2000);
         }
     }

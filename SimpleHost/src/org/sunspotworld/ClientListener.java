@@ -22,16 +22,21 @@ class ClientListener implements Runnable {
 
     public void run() {
         while (true) {
+            System.out.println("Listening for clinets...");
             String[] answers = NetworkUtils.receiveMessagesFromBroadcast(2, 11);
             if (answers != null) {
                 String type = answers[0], clientAddress = answers[1];
+                System.out.println("Client found: clientAddress");
                 if (type != null && type.equals("client")) {
                     NetworkUtils.sendMessageToAddress(clientAddress, "connected");
                     if (host.addClient(clientAddress)) {
                         System.out.println("Connection established with: " + clientAddress);
                     }
                 }
+            } else {
+                System.out.println("No client found");
             }
+
             Utils.sleep(1000);
         }
     }

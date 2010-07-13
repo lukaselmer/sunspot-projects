@@ -37,23 +37,25 @@ public class HostListener implements Runnable {
         while (true) {
             if (!client.connectedToHost()) {
                 String[] ss = NetworkUtils.receiveMessagesFromBroadcast(2, listeningPort);
-                String answer = ss[0], hostAddress = ss[1];
-                Utils.sleep(200);
-                if (answer != null && answer.equals("host") && hostAddress != null && hostAddress.length() > 0) {
-                    NetworkUtils.sendMessageToAddress(hostAddress, "client", answerPort);
-                    client.connectToHost(hostAddress);
+                if (ss != null) {
+                    String answer = ss[0], hostAddress = ss[1];
+                    Utils.sleep(200);
+                    if (answer != null && answer.equals("host") && hostAddress != null && hostAddress.length() > 0) {
+                        NetworkUtils.sendMessageToAddress(hostAddress, "client", answerPort);
+                        client.connectToHost(hostAddress);
+                    }
                 }
             } else {
                 System.out.println("Checking connection...");
                 String[] ss = NetworkUtils.receiveMessagesFromAddress(client.getCurrentHost(), 1, 12);
-                if (ss.equals("connected")) {
+                if (ss != null && ss[0].equals("connected")) {
                     System.out.println("Connection ok!");
                 } else {
                     client.disconnectFromHost();
                     System.out.println("Disconnected!");
                 }
             }
-            Utils.sleep(300);
+            Utils.sleep(1000);
         }
     }
 }
