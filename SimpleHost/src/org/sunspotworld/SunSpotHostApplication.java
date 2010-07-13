@@ -23,41 +23,14 @@ import javax.rmi.CORBA.Util;
  */
 public class SunSpotHostApplication {
 
-    private boolean connected = false;
+    private SimpleHost host;
 
     /**
      * Print out our radio address.
      */
     public void run() {
-        long ourAddr = RadioFactory.getRadioPolicyManager().getIEEEAddress();
-        System.out.println("Our radio address = " + IEEEAddress.toDottedHex(ourAddr));
-        Logger logger = Logger.getLogger(SunSpotHostApplication.class.getName());
-
-        try {
-            while (!connected) {
-                DatagramConnection sendConn = (DatagramConnection) Connector.open("radiogram://broadcast:10");
-                Datagram dgSend = sendConn.newDatagram(sendConn.getMaximumLength());
-                dgSend.writeUTF("Host");
-                sendConn.send(dgSend);
-                logger.log(Level.ALL, "Packet sent...");
-                Utils.sleep(1000);
-
-                DatagramConnection recvConn = (DatagramConnection) Connector.open("radiogram://:11");
-                Datagram dgReceive = recvConn.newDatagram(recvConn.getMaximumLength());
-                recvConn.receive(dgReceive);
-                logger.log(Level.ALL, "Receiving packet...");
-                String answer = dgReceive.readUTF();
-                logger.log(Level.ALL, "Answer: " + answer);
-                Utils.sleep(1000);
-                if (answer != null && answer.equals("")) {
-                    connected = true;
-                    logger.log(Level.ALL, "Connection established with: " + answer);
-                }
-            }
-
-        } catch (IOException ex) {
-            logger.log(Level.SEVERE, null, ex);
-        }
+        host = new SimpleHost();
+        
         System.exit(0);
     }
 
