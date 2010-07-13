@@ -41,47 +41,11 @@ class SimpleClient implements Runnable {
 
         initLeds();
 
-        hostListener = new HostListener(this);
+        hostListener = new HostListener(this, 10, 11);
         hostListenerThread = new Thread(hostListener);
         hostListenerThread.start();
 
         LedsHelper.blink();
-
-        try {
-            leds[0].setRGB(0, 0, 100);
-            leds[0].setOn();
-            Utils.sleep(1000);
-
-            while (!connected && sw1.isOpen()) {
-                System.out.println("Listening...");
-                DatagramConnection recvConn = (DatagramConnection) Connector.open("radiogram://:10");
-                Datagram dgReceive = recvConn.newDatagram(recvConn.getMaximumLength());
-                recvConn.receive(dgReceive);
-
-                System.out.println("Receiving packet...");
-                String recvFromAddress = dgReceive.getAddress();
-                String answer = dgReceive.readUTF();
-                String ownAddress = dgReceive.readUTF();
-                System.out.println("Answer: " + answer);
-                System.out.println("Address: " + recvFromAddress);
-                System.out.println("ownAddress: " + ownAddress);
-                Utils.sleep(1000);
-                recvConn.close();
-                if (answer != null && answer.equals("Host") && ownAddress != null && ownAddress.length() > 0) {
-                    DatagramConnection sendConn = (DatagramConnection) Connector.open("radiogram://" + ownAddress + ":11");
-                    Datagram dgSend = sendConn.newDatagram(sendConn.getMaximumLength());
-                    dgSend.writeUTF("Client");
-                    sendConn.send(dgSend);
-                    System.out.println("Connection established with: " + ownAddress);
-                    sendConn.close();
-                    connected = true;
-                    Utils.sleep(1000);
-                }
-            }
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
     }
 
     public void stopApp() {
@@ -109,15 +73,28 @@ class SimpleClient implements Runnable {
     }
 
     public void run() {
+        leds[0].setRGB(0, 0, 100);
+        leds[0].setOn();
+
+        try {
+            hostListenerThread.join();
+        } catch (InterruptedException ex) {
+            ex.printStackTrace();
+        }
     }
 
     private void initLeds() {
+    }
+
+    public boolean connectedToHost() {
+        return connected;
     }
 
     public void connectToHost(String host) {
         if (host != null && host.length() > 0) {
             currentHost = host;
             connected = true;
+            System.out.println("Connection established with: " + host);
         } else {
             currentHost = null;
             connected = false;
