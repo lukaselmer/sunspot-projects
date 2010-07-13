@@ -3,6 +3,9 @@
     <type>org.netbeans.modules.ant.freeform</type>
     <configuration>
         <general-data xmlns="http://www.netbeans.org/ns/freeform-project/1">
+            <name>SimpleHost</name>
+        </general-data>
+        <general-data xmlns="http://www.netbeans.org/ns/freeform-project/2">
             <!--Do not use Project Properties customizer when editing this file manually.-->
             <name>SimpleHost</name>
             <properties>
@@ -16,6 +19,12 @@
                     <label>src</label>
                     <type>java</type>
                     <location>src</location>
+                    <encoding>windows-1252</encoding>
+                </source-folder>
+                <source-folder>
+                    <label>SimpleHost</label>
+                    <location>.</location>
+                    <encoding>windows-1252</encoding>
                 </source-folder>
             </folders>
             <ide-actions>
@@ -78,7 +87,7 @@
         <java-data xmlns="http://www.netbeans.org/ns/freeform-project-java/1">
             <compilation-unit>
                 <package-root>src</package-root>
-                <classpath mode="compile">NetBeans69platformmodulesextswing-layout-1.0.4.jar;NetBeans69javamodulesextAbsoluteLayout.jar;C:/SunSPOT/sdk/lib/multihop_common.jar;C:/SunSPOT/sdk/lib/spotlib_host.jar;C:/SunSPOT/sdk/lib/spotlib_common.jar;C:/SunSPOT/sdk/lib/squawk_common.jar;C:/SunSPOT/sdk/lib/RXTXcomm.jar;C:/SunSPOT/sdk/lib/spotclient_host.jar;C:/SunSPOT/sdk/lib/signing_host.jar;	</classpath>
+                <classpath mode="compile">NetBeans69platformmodulesextswing-layout-1.0.4.jar;NetBeans69javamodulesextAbsoluteLayout.jar;C:/SunSPOT/sdk/lib/multihop_common.jar;C:/SunSPOT/sdk/lib/spotlib_host.jar;C:/SunSPOT/sdk/lib/spotlib_common.jar;C:/SunSPOT/sdk/lib/squawk_common.jar;C:/SunSPOT/sdk/lib/RXTXcomm.jar;C:/SunSPOT/sdk/lib/spotclient_host.jar;C:/SunSPOT/sdk/lib/signing_host.jar;../SunspotHelperLibrary/src</classpath>
                 <built-to>build</built-to>
                 <source-level>1.5</source-level>
             </compilation-unit>

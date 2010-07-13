@@ -22,25 +22,15 @@ class ClientListener implements Runnable {
 
     public void run() {
         while (true) {
-            try {
-                System.out.println("Receiving answer...");
-                DatagramConnection recvConn = (DatagramConnection) Connector.open("radiogram://:11");
-                Datagram dgReceive = recvConn.newDatagram(recvConn.getMaximumLength());
-                recvConn.receive(dgReceive);
-                System.out.println("Receiving packet...");
-                String answer = dgReceive.readUTF();
-                String clientAddress = dgReceive.readUTF();
-                System.out.println("Answer: " + answer);
-                System.out.println("ClientAddress: " + clientAddress);
-                Utils.sleep(1000);
-                recvConn.close();
-                if (answer != null && answer.equals("Client")) {
+            String[] answers = NetworkUtils.receiveMessagesFromBroadcast(2, 11);
+            String type = answers[0], clientAddress = answers[1];
+            if (type != null && type.equals("client")) {
+                NetworkUtils.sendMessageToAddress(clientAddress, "connected");
+                if (host.addClient(clientAddress)) {
                     System.out.println("Connection established with: " + clientAddress);
-                    NetworkUtils.sendMessageToAddress();
                 }
-            } catch (IOException ex) {
-                Logger.getLogger(ClientListener.class.getName()).log(Level.SEVERE, null, ex);
             }
+            Utils.sleep(1000);
         }
     }
 }

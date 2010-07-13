@@ -22,10 +22,10 @@ import javax.rmi.CORBA.Util;
  */
 public class SimpleHost {
 
-    private boolean connected = false;
     private String hostAddress;
     private Broadcaster broadcaster;
     private Thread broadcasterThread;
+    private Thread clientListenerThread;
     private ClientListener clientListener;
     private List<String> clients = new ArrayList<String>();
 
@@ -38,7 +38,7 @@ public class SimpleHost {
         broadcasterThread.start();
 
         clientListener = new ClientListener(this);
-        Thread clientListenerThread = new Thread(clientListener);
+        clientListenerThread = new Thread(clientListener);
         clientListenerThread.start();
     }
 

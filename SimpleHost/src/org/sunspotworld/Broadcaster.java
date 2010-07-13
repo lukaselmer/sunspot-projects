@@ -24,18 +24,10 @@ class Broadcaster implements Runnable {
 
     public void run() {
         while (true) {
-            try {
-                DatagramConnection sendConn = (DatagramConnection) Connector.open("radiogram://broadcast:" + port);
-                Datagram dgSend = sendConn.newDatagram(sendConn.getMaximumLength());
-                dgSend.writeUTF("Host");
-                dgSend.writeUTF(host.getHostAddress());
-                sendConn.send(dgSend);
-                sendConn.close();
-                System.out.println("Broadcast packet sent...");
-                Utils.sleep(1000);
-            } catch (IOException ex) {
-                Logger.getLogger(Broadcaster.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            String[] ss = {"host", host.getHostAddress()};
+            NetworkUtils.sendMessagesToBroadcast(ss, port);
+            System.out.println("Broadcast packet sent");
+            Utils.sleep(1000);
         }
     }
 }
