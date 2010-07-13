@@ -4,10 +4,13 @@ import com.sun.spot.peripheral.radio.RadioFactory;
 import com.sun.spot.peripheral.radio.IRadioPolicyManager;
 import com.sun.spot.io.j2me.radiostream.*;
 import com.sun.spot.io.j2me.radiogram.*;
+import com.sun.spot.peripheral.radio.BroadcastConnectionState;
 import com.sun.spot.util.IEEEAddress;
 import com.sun.spot.util.Utils;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.microedition.io.*;
@@ -20,39 +23,41 @@ import javax.rmi.CORBA.Util;
 public class SimpleHost {
 
     private boolean connected = false;
+    private String hostAddress;
+    private Broadcaster broadcaster;
+    private Thread broadcasterThread;
+    private ClientListener clientListener;
+    private List<String> clients = new ArrayList<String>();
 
     public SimpleHost() {
-        long ourAddr = RadioFactory.getRadioPolicyManager().getIEEEAddress();
-        System.out.println("Our radio address = " + IEEEAddress.toDottedHex(ourAddr));
+        hostAddress = IEEEAddress.toDottedHex(RadioFactory.getRadioPolicyManager().getIEEEAddress());
+        System.out.println("Host address is = " + hostAddress);
 
-        try {
-            while (!connected) {
-                DatagramConnection sendConn = (DatagramConnection) Connector.open("radiogram://broadcast:10");
-                Datagram dgSend = sendConn.newDatagram(sendConn.getMaximumLength());
-                dgSend.writeUTF("Host");
-                dgSend.writeUTF(IEEEAddress.toDottedHex(ourAddr));
-                sendConn.send(dgSend);
-                System.out.println("Packet sent...");
-                Utils.sleep(1000);
-                sendConn.close();
+        broadcaster = new Broadcaster(this, 10);
+        broadcasterThread = new Thread(broadcaster);
+        broadcasterThread.start();
 
-                System.out.println("Receiving answer...");
-                DatagramConnection recvConn = (DatagramConnection) Connector.open("radiogram://:11");
-                Datagram dgReceive = recvConn.newDatagram(recvConn.getMaximumLength());
-                recvConn.receive(dgReceive);
-                System.out.println("Receiving packet...");
-                String answer = dgReceive.readUTF();
-                System.out.println("Answer: " + answer);
-                Utils.sleep(1000);
-                recvConn.close();
-                if (answer != null && answer.equals("")) {
-                    connected = true;
-                    System.out.println("Connection established with: " + answer);
-                }
-            }
+        clientListener = new ClientListener(this);
+        Thread clientListenerThread = new Thread(clientListener);
+        clientListenerThread.start();
+    }
 
-        } catch (IOException ex) {
-            Logger.getLogger(SunSpotHostApplication.class.getName()).log(Level.SEVERE, null, ex);
+    public String getHostAddress() {
+        return hostAddress;
+    }
+
+    public boolean addClient(String client) {
+        if (containsClient(client)) {
+            return false;
         }
+        return clients.add(client);
+    }
+
+    public boolean containsClient(String client) {
+        return clients.contains(client);
+    }
+
+    public boolean removeClient(String client) {
+        return clients.remove(client);
     }
 }
