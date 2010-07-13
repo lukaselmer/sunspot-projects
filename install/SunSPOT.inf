@@ -1,77 +1,89 @@
-; Information file for Sun SPOT
+;
+; Device Driver Setup file for the Sun SPOT
 ; Copyright (C) 2005 Sun Microsystems Inc.
+;
+
 [Version]
-Signature="$CHICAGO$"
-Class=Ports
-ClassGuid={4D36E978-E325-11CE-BFC1-08002BE10318}
-Provider=%Mfg%
-DriverVer=12/06/2005,0.0.0.1
-LayoutFile=Layout.inf
+Signature = "$Windows NT$"
+Class = Ports
+ClassGuid = {4d36e978-e325-11ce-bfc1-08002be10318}
+Provider = %COMPANYNAME%
+LayoutFile = layout.inf
+DriverVer = 04/24/2010,1.0.0.1
+; SunSPOT are currently not signed
+; uncomment when signed
+;CatalogFile = SunSPOT.cat
+;CatalogFile.NT = SunSPOT.cat
+;CatalogFile.NTamd64 = SunSPOT_x64.cat
+
+[Strings]
+COMPANYNAME	="Oracle Inc."
+DESCRIPTION	="Sun SPOT"
+SERVICENAME	="Sun SPOT USB CDC Driver"
+OSCD		="Microsoft Windows Install CD"
 
 [Manufacturer]
-%Mfg%=DeviceList, NTamd64
-
-[DeviceList]
-%Spot%=SpotInstall, USB\VID_0430&PID_1000
-
-[DeviceList.NTamd64]
-%Spot%=SpotInstall, USB\VID_0430&PID_1000
-
-[SpotInstall]
-include=mdmcpq.inf
-CopyFiles=SpotCopyFiles
-AddReg=SpotAddReg
-
-[SpotCopyFiles]
-usbser.sys
+%COMPANYNAME% = Devices, NT, NTamd64
 
 [DestinationDirs]
-DefaultDestDir=10,System32\Drivers
+DefaultDestDir = 12 
 
-[SpotAddReg]
+[SourceDisksNames]
+;1=%OSCD%,,, 
+ 
+[SourceDisksFiles]
+
+[Devices]
+%DESCRIPTION% = DriverInstall, USB\VID_0430&PID_1000
+
+[Devices.NT]
+%DESCRIPTION% = DriverInstall, USB\VID_0430&PID_1000
+
+[Devices.NTamd64]
+%DESCRIPTION% = DriverInstall, USB\VID_0430&PID_1000
+
+; Windows 2000/XP/Vista/7 32-bit
+
+[DriverInstall.NT]
+include = mdmcpq.inf
+CopyFiles = DriverCopyFile.NT
+AddReg = DriverInstall.NT.AddReg
+
+[DriverCopyFile.NT]
+usbser.sys,,,0x00000020
+
+[DriverInstall.NT.AddReg]
 HKR,,DevLoader,,*ntkern
 HKR,,NTMPDriver,,usbser.sys
 HKR,,EnumPropPages32,,"MsPorts.dll,SerialPortPropPageProvider"
 
-[SpotInstall.Services]
-AddService = usbser,0x0002,SpotService
+[DriverInstall.NT.Services]
+include = mdmcpq.inf
+AddService = usbser,0x00000002,DriverService.NT
 
-[SpotService]
-DisplayName = %Spot_display_name%
-ServiceType = 1                  ; SERVICE_KERNEL_DRIVER
-StartType = 3                    ; SERVICE_DEMAND_START
-ErrorControl = 1                 ; SERVICE_ERROR_NORMAL
-ServiceBinary = %10%\System32\Drivers\usbser.sys
+[DriverService.NT]
+DisplayName = %SERVICENAME%
+ServiceType = 0x00000001
+StartType = 0x3
+ErrorControl = 0x1
+ServiceBinary = %12%\usbser.sys
 LoadOrderGroup = Base
 
-[DriverInstall.NTamd64] 
-include=mdmcpq.inf
-CopyFiles=DriverCopyFiles.NTamd64
-AddReg=DriverInstall.NTamd64.AddReg 
+; Windows Vista/7 64-bit
 
-[DriverCopyFiles.NTamd64]
-%DRIVERFILENAME%.sys,,,0x20
+[DriverInstall.NTamd64]
+include = mdmcpq.inf
+CopyFiles = DriverCopyFile.NTamd64
+AddReg = DriverInstall.NTamd64.AddReg
 
-[DriverInstall.NTamd64.AddReg] 
-HKR,,DevLoader,,*ntkern 
-HKR,,NTMPDriver,,%DRIVERFILENAME%.sys 
-HKR,,EnumPropPages32,,"MsPorts.dll,SerialPortPropPageProvider" 
+[DriverCopyFile.NTamd64]
+usbser.sys,,,0x00000020
 
-[DriverInstall.NTamd64.Services] 
-AddService=usbser, 0x00000002, DriverService.NTamd64
+[DriverInstall.NTamd64.AddReg]
+HKR,,DevLoader,,*ntkern
+HKR,,NTMPDriver,,usbser.sys
+HKR,,EnumPropPages32,,"MsPorts.dll,SerialPortPropPageProvider"
 
-[DriverService.NTamd64] 
-DisplayName=%SERVICE% 
-ServiceType=1
-StartType=3
-ErrorControl=1
-ServiceBinary=%12%\%DRIVERFILENAME%.sys 
-
-[Strings]
-MFGFILENAME="Sun SPOT"
-DRIVERFILENAME ="usbser"
-MFGNAME="sun microsystems"
-INSTDISK="foo"
-DESCRIPTION="Communications Port"
-SERVICE="USB RS-232 Emulation Driver"
+[DriverInstall.NTamd64.Services]
+AddService = usbser,0x00000002,DriverService.NT
 
