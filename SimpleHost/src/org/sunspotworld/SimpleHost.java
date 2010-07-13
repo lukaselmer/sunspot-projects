@@ -20,7 +20,7 @@ import javax.rmi.CORBA.Util;
  *
  * @author Lukas Elmer
  */
-public class SimpleHost {
+public class SimpleHost implements Runnable {
 
     private String hostAddress;
     private Broadcaster broadcaster;
@@ -28,6 +28,8 @@ public class SimpleHost {
     private Thread clientListenerThread;
     private ClientListener clientListener;
     private List<String> clients = new ArrayList<String>();
+    private final ConnectionChecker connectionChecker;
+    private final Thread connectionCheckerThread;
 
     public SimpleHost() {
         hostAddress = IEEEAddress.toDottedHex(RadioFactory.getRadioPolicyManager().getIEEEAddress());
@@ -40,6 +42,14 @@ public class SimpleHost {
         clientListener = new ClientListener(this);
         clientListenerThread = new Thread(clientListener);
         clientListenerThread.start();
+
+        connectionChecker = new ConnectionChecker(this);
+        connectionCheckerThread = new Thread(connectionChecker);
+        connectionCheckerThread.start();
+    }
+
+    public List<String> getClients() {
+        return clients;
     }
 
     public String getHostAddress() {
@@ -59,5 +69,18 @@ public class SimpleHost {
 
     public boolean removeClient(String client) {
         return clients.remove(client);
+    }
+
+    public void run() {
+        while (true) {
+            System.out.println("---");
+            System.out.println("" + clients.size() + " clients connected.");
+            for (int i = 0; i < clients.size(); i++) {
+                String client = clients.get(i);
+                System.out.println("Client " + i + ": " + client);
+            }
+            System.out.println("---");
+            Utils.sleep(2000);
+        }
     }
 }

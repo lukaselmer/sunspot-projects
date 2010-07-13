@@ -31,6 +31,8 @@ class SimpleClient implements Runnable {
     private Thread hostListenerThread;
     private boolean connected = false;
     private String currentHost = null;
+    private ExitListener exitListener;
+    private Thread exitListenerThread;
 
     public SimpleClient(StartApplication midlet) {
         System.out.println("Starting client");
@@ -44,6 +46,10 @@ class SimpleClient implements Runnable {
         hostListener = new HostListener(this, 10, 11);
         hostListenerThread = new Thread(hostListener);
         hostListenerThread.start();
+
+        exitListener = new ExitListener(this);
+        exitListenerThread = new Thread(exitListener);
+        exitListenerThread.start();
 
         LedsHelper.blink();
     }
@@ -76,14 +82,15 @@ class SimpleClient implements Runnable {
         leds[0].setRGB(0, 0, 100);
         leds[0].setOn();
 
-        try {
-            hostListenerThread.join();
-        } catch (InterruptedException ex) {
-            ex.printStackTrace();
+        while (true) {
         }
     }
 
     private void initLeds() {
+    }
+
+    public String getCurrentHost() {
+        return currentHost;
     }
 
     public boolean connectedToHost() {

@@ -26,8 +26,7 @@ class Broadcaster implements Runnable {
         while (true) {
             String[] ss = {"host", host.getHostAddress()};
             NetworkUtils.sendMessagesToBroadcast(ss, port);
-            System.out.println("Broadcast packet sent");
-            Utils.sleep(1000);
+            Utils.sleep(3000);
         }
     }
 }

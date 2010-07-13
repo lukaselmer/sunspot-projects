@@ -30,8 +30,7 @@ public class SunSpotHostApplication {
      */
     public void run() {
         host = new SimpleHost();
-        
-        System.exit(0);
+        host.run();
     }
 
     /**

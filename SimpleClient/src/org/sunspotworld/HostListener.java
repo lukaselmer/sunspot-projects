@@ -27,6 +27,7 @@ public class HostListener implements Runnable {
     private final int answerPort;
 
     public HostListener(SimpleClient client, int listeningPort, int answerPort) {
+        this.client = client;
         this.listeningPort = listeningPort;
         this.answerPort = answerPort;
     }
@@ -42,8 +43,17 @@ public class HostListener implements Runnable {
                     NetworkUtils.sendMessageToAddress(hostAddress, "client", answerPort);
                     client.connectToHost(hostAddress);
                 }
-                Utils.sleep(1000);
+            } else {
+                System.out.println("Checking connection...");
+                String[] ss = NetworkUtils.receiveMessagesFromAddress(client.getCurrentHost(), 1, 12);
+                if (ss.equals("connected")) {
+                    System.out.println("Connection ok!");
+                } else {
+                    client.disconnectFromHost();
+                    System.out.println("Disconnected!");
+                }
             }
+            Utils.sleep(300);
         }
     }
 }

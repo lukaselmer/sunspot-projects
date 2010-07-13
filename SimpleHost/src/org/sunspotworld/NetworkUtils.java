@@ -69,12 +69,14 @@ public final class NetworkUtils {
     }
 
     public static String[] receiveMessagesFromBroadcast(int lines, int port) {
+        return receiveMessagesFromAddress("", lines, port);
+    }
+
+    public static String[] receiveMessagesFromAddress(String targetIEEEAddress, int lines, int port) {
         try {
-            System.out.println("Receiving answer...");
-            DatagramConnection recvConn = (DatagramConnection) Connector.open("radiogram://:" + port);
+            DatagramConnection recvConn = (DatagramConnection) Connector.open("radiogram://" + targetIEEEAddress + ":" + port);
             Datagram dgReceive = recvConn.newDatagram(recvConn.getMaximumLength());
             recvConn.receive(dgReceive);
-            System.out.println("Receiving packet...");
             String[] answers = new String[lines];
             for (int i = 0; i < answers.length; i++) {
                 answers[i] = dgReceive.readUTF();
