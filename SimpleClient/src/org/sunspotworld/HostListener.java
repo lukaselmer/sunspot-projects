@@ -33,13 +33,12 @@ public class HostListener implements Runnable {
     }
 
     public void run() {
-        System.out.println("Listening for hosts...");
         while (true) {
             if (!client.connectedToHost()) {
+                System.out.println("Listening for hosts...");
                 String[] ss = NetworkUtils.receiveMessagesFromBroadcast(2, listeningPort);
                 if (ss != null) {
                     String answer = ss[0], hostAddress = ss[1];
-                    Utils.sleep(200);
                     if (answer != null && answer.equals("host") && hostAddress != null && hostAddress.length() > 0) {
                         NetworkUtils.sendMessageToAddress(hostAddress, "client", answerPort);
                         client.connectToHost(hostAddress);
