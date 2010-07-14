@@ -7,7 +7,6 @@ class PuzzleGame < ActiveRecord::Base
 
   def game_time
     seconds = (cycle_times * 250.0 / 1000.0)
-    seconds = 234.3
     minutes = ((seconds - (seconds % 60)) / 60).to_i
     seconds -= minutes * 60
     [minutes, seconds].collect
