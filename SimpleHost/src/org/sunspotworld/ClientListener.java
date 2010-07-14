@@ -26,19 +26,13 @@ class ClientListener implements Runnable {
             String[] ss = NetworkUtils.receiveMessagesFromBroadcast(3, 41);
             if (ss != null) {
                 String type = ss[0], hostAddress = ss[1], clientAddress = ss[2];
-
-                System.out.println("OOOOOOOOOOOOOOOOOOOO");
-                System.out.println("OOOOOOOOOOOOOOOOOOOO");
-                System.out.println(type);
-                System.out.println(hostAddress);
-                System.out.println(clientAddress);
-                System.out.println("OOOOOOOOOOOOOOOOOOOO");
-                System.out.println("OOOOOOOOOOOOOOOOOOOO");
-
                 System.out.println("Client found: " + clientAddress);
                 if (type != null && type.equals("client_connect") && hostAddress.equals(host.getHostAddress())) {
                     String[] welcomeMessage = {"connected", "welcome to the server"};
                     NetworkUtils.sendMessagesToAddress(clientAddress, welcomeMessage, 42);
+                    if (host.containsClient(clientAddress)) {
+                        host.removeClient(clientAddress);
+                    }
                     if (host.addClient(clientAddress)) {
                         System.out.println("Connection established with: " + clientAddress);
                     }
