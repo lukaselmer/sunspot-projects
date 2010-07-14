@@ -13,7 +13,7 @@ import javax.microedition.io.DatagramConnection;
  */
 public final class NetworkUtils {
 
-    public static final int DEFAULT_PORT = 10;
+    public static final int DEFAULT_PORT = 40;
     public static final String BROADCAST_ADDRESS = "broadcast";
 
     private NetworkUtils() {
@@ -53,15 +53,18 @@ public final class NetworkUtils {
 
     public static boolean sendMessagesToAddress(String targetIEEEAddress, String[] messages, int port) {
         try {
-            RadiogramConnection conn = (RadiogramConnection) Connector.open("radiogram://" + targetIEEEAddress + ":" + port, Connector.READ_WRITE, false);
-            conn.setTimeout(2000);
+            RadiogramConnection conn = (RadiogramConnection) Connector.open("radiogram://" + targetIEEEAddress + ":" + port, Connector.WRITE, false);
             try {
+                conn.setTimeout(10000);
                 Datagram dg = conn.newDatagram(conn.getMaximumLength());
                 for (int i = 0; i < messages.length; i++) {
                     dg.writeUTF(messages[i]);
                 }
                 conn.send(dg);
             } catch (IOException ex) {
+                conn.close();
+                System.out.println("Timeout!");
+                return false;
             }
             conn.close();
             return true;
@@ -79,21 +82,28 @@ public final class NetworkUtils {
 
     public static String[] receiveMessagesFromAddress(String targetIEEEAddress, int lines, int port) {
         try {
-            RadiogramConnection recvConn = (RadiogramConnection) Connector.open("radiogram://" + targetIEEEAddress + ":" + port, Connector.READ_WRITE, false);
-            recvConn.setTimeout(2000);
-            Datagram dgReceive = recvConn.newDatagram(recvConn.getMaximumLength());
-            recvConn.receive(dgReceive);
-            String[] answers = new String[lines];
-            for (int i = 0; i < answers.length; i++) {
-                answers[i] = dgReceive.readUTF();
+            RadiogramConnection recvConn = (RadiogramConnection) Connector.open("radiogram://" + targetIEEEAddress + ":" + port, Connector.READ, false);
+            try {
+                recvConn.setTimeout(10000);
+                Datagram dgReceive = recvConn.newDatagram(recvConn.getMaximumLength());
+                recvConn.receive(dgReceive);
+                String[] answers = new String[lines];
+                for (int i = 0; i < answers.length; i++) {
+                    answers[i] = dgReceive.readUTF();
+                }
+                recvConn.close();
+                return answers;
+            } catch (IOException ex) {
+                recvConn.close();
+                System.out.println("Timeout!");
+                return null;
             }
-            recvConn.close();
-            return answers;
         } catch (IOException ex) {
             System.out.println("Timeout!");
             return null;
         } catch (java.lang.IllegalArgumentException ex) {
             return null;
+
         }
     }
 }

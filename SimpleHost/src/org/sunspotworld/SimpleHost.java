@@ -10,7 +10,9 @@ import com.sun.spot.util.Utils;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.microedition.io.*;
@@ -28,14 +30,16 @@ public class SimpleHost implements Runnable {
     private Thread clientListenerThread;
     private ClientListener clientListener;
     private List<String> clients = new ArrayList<String>();
-    private final ConnectionChecker connectionChecker;
-    private final Thread connectionCheckerThread;
+//    private Map<String, ConnectionSender> connectionSenders = new HashMap<String, ConnectionSender>();
+//    private Map<String, Thread> connectionSenderThreads = new HashMap<String, Thread>();
+//    private ConnectionChecker connectionChecker;
+//    private Thread connectionCheckerThread;
 
     public SimpleHost() {
         hostAddress = IEEEAddress.toDottedHex(RadioFactory.getRadioPolicyManager().getIEEEAddress());
         System.out.println("Host address is = " + hostAddress);
 
-        broadcaster = new Broadcaster(this, 10);
+        broadcaster = new Broadcaster(this, 40);
         broadcasterThread = new Thread(broadcaster);
         broadcasterThread.start();
 
@@ -43,9 +47,9 @@ public class SimpleHost implements Runnable {
         clientListenerThread = new Thread(clientListener);
         clientListenerThread.start();
 
-        connectionChecker = new ConnectionChecker(this);
-        connectionCheckerThread = new Thread(connectionChecker);
-        connectionCheckerThread.start();
+//        connectionChecker = new ConnectionChecker(this);
+//        connectionCheckerThread = new Thread(connectionChecker);
+//        connectionCheckerThread.start();
     }
 
     public List<String> getClients() {
@@ -60,6 +64,13 @@ public class SimpleHost implements Runnable {
         if (containsClient(client)) {
             return false;
         }
+//        if (!connectionSenders.containsKey(client) && !connectionSenderThreads.containsKey(client)) {
+//            ConnectionSender connectionSender = new ConnectionSender(client);
+//            Thread connectionSenderThread = new Thread(connectionSender);
+//            connectionSenderThread.start();
+//            connectionSenders.put(client, connectionSender);
+//            connectionSenderThreads.put(client, connectionSenderThread);
+//        }
         return clients.add(client);
     }
 
@@ -68,6 +79,8 @@ public class SimpleHost implements Runnable {
     }
 
     public boolean removeClient(String client) {
+//        connectionSenders.remove(client).setInactive();
+//        connectionSenderThreads.remove(client);
         return clients.remove(client);
     }
 

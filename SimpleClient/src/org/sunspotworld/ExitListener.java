@@ -33,6 +33,7 @@ public class ExitListener implements Runnable {
             if (sw2.isClosed()) {
                 client.exit();
             }
+            Utils.sleep(50);
         }
     }
 }

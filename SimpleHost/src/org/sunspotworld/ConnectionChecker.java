@@ -25,29 +25,15 @@ public class ConnectionChecker implements Runnable {
         while (true) {
             for (String client : host.getClients()) {
                 System.out.println("Testing connection to " + client + "...");
-                boolean connected = false;
-                try {
-                    RadiogramConnection conn = (RadiogramConnection) Connector.open("radiogram://" + client + ":" + 12, Connector.READ_WRITE, true);
-                    conn.setTimeout(550);
-                    Datagram dg = conn.newDatagram(conn.getMaximumLength());
-                    dg.writeUTF("connected");
-                    conn.send(dg);
-                    Utils.sleep(50);
-                    conn.receive(dg);
-                    connected = dg.readUTF().equals("connected");
-                    conn.close();
-                } catch (IOException ex) {
-                    connected = false;
-                    ex.printStackTrace();
-                }
-                if (!connected) {
+                String[] ss = NetworkUtils.receiveMessagesFromAddress(client, 1, 42);
+                if (ss != null && ss.equals("connected")) {
+                    System.out.println("Connection to " + client + " ok!");
+                } else {
                     System.out.println("Connection to " + client + " lost!");
                     host.removeClient(client);
-                } else {
-                    System.out.println("Connection to " + client + " ok!");
+                    break;
                 }
             }
-            Utils.sleep(300);
         }
     }
 }

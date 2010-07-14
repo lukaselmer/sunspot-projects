@@ -33,6 +33,8 @@ class SimpleClient implements Runnable {
     private String currentHost = null;
     private ExitListener exitListener;
     private Thread exitListenerThread;
+//    private ConnectionSender connectionSender;
+//    private Thread connectionSenderThread;
 
     public SimpleClient(StartApplication midlet) {
         System.out.println("Starting client");
@@ -43,7 +45,9 @@ class SimpleClient implements Runnable {
 
         initLeds();
 
-        hostListener = new HostListener(this, 10, 11);
+        LedsHelper.blink();
+
+        hostListener = new HostListener(this, 40, 41);
         hostListenerThread = new Thread(hostListener);
         hostListenerThread.start();
 
@@ -51,7 +55,10 @@ class SimpleClient implements Runnable {
         exitListenerThread = new Thread(exitListener);
         exitListenerThread.start();
 
-        LedsHelper.blink();
+//        connectionSender = new ConnectionSender(this);
+//        connectionSenderThread = new Thread(connectionSender);
+//        connectionSenderThread.start();
+
     }
 
     public void stopApp() {
@@ -84,6 +91,10 @@ class SimpleClient implements Runnable {
 
         while (true) {
         }
+    }
+
+    public String getOwnAddress() {
+        return ownAddress;
     }
 
     private void initLeds() {
