@@ -25,7 +25,7 @@ import javax.microedition.midlet.MIDletStateChangeException;
 class SimpleClient implements Runnable {
 
     private String ownAddress;
-//    private ITriColorLED[] leds = EDemoBoard.getInstance().getLEDs();
+    private ITriColorLED[] leds = EDemoBoard.getInstance().getLEDs();
     private StartApplication midlet;
     ISwitch sw1 = EDemoBoard.getInstance().getSwitches()[EDemoBoard.SW1];
 //    ISwitch sw2 = EDemoBoard.getInstance().getSwitches()[EDemoBoard.SW2];
@@ -90,18 +90,28 @@ class SimpleClient implements Runnable {
     }
 
     public void run() {
-        ITriColorLED[] leds = EDemoBoard.getInstance().getLEDs();
         leds[0].setRGB(50, 50, 50);
         leds[0].setOn();
-        while (sw1.isOpen()) {
-            if (!connectedToHost()) {
-                connectToHost();
-            } else {
-                if (!sendAccMessage()) {
-                    disconnectFromHost();
+        try {
+            while (sw1.isOpen()) {
+                if (!connectedToHost()) {
+                    connectToHost();
+                } else {
+                    System.out.println("Sending acc message...");
+                    if (!sendAccMessage()) {
+                        System.out.println("Error!");
+                        disconnectFromHost();
+                    } else {
+                        System.out.println("Acc message ok!");
+                    }
                 }
             }
+        } catch (Exception ex) {
+            System.out.println("HEAVY EXCEPTION IN SIMPLE CLIENT THREAD:");
+            ex.printStackTrace();
         }
+        leds[0].setRGB(100, 0, 0);
+        leds[0].setOn();
         exit();
     }
 
@@ -126,18 +136,13 @@ class SimpleClient implements Runnable {
             connected = true;
             System.out.println("Connection established with: " + host);
             System.out.println("Additional info: " + additionalInfo);
-            System.out.println("CCCCCCCCCCCCCCCCCCCCCCCCCCC");
-            System.out.println("CCCCCCCCCCCCCCCCCCCCCCCCCCC");
-            System.out.println("CCCCCCCCCCCCCCCCCCCCCCCCCCC");
-            System.out.println("CCCCCCCCCCCCCCCCCCCCCCCCCCC");
+            leds[1].setColor(LEDColor.GREEN);
+            leds[1].setOn();
         } else {
             System.out.println("Connection lost!");
-            System.out.println("DDDDDDDDDDDDDDDDDDDDDDDDDDD");
-            System.out.println("DDDDDDDDDDDDDDDDDDDDDDDDDDD");
-            System.out.println("DDDDDDDDDDDDDDDDDDDDDDDDDDD");
-            System.out.println("DDDDDDDDDDDDDDDDDDDDDDDDDDD");
             currentHost = null;
             connected = false;
+            leds[1].setOff();
         }
     }
 
@@ -148,8 +153,8 @@ class SimpleClient implements Runnable {
     }
 
     void exit() {
-        if (hostListenerThread.isAlive()) {
-            hostListenerThread.interrupt();
+        if (exitListenerThread != null && exitListenerThread.isAlive()) {
+            exitListenerThread.interrupt();
         }
         disconnectFromHost();
         LedsHelper.sneake(LEDColor.CYAN);
@@ -158,9 +163,14 @@ class SimpleClient implements Runnable {
         midlet.notifyDestroyed();
     }
 
-    private void connectToHost() {
-        HostListener h = new HostListener(this, 40, 41, 42);
-        h.run();
+    private boolean connectToHost() {
+        if (!connectedToHost()) {
+            HostListener h = new HostListener(this, 40, 41, 42);
+            h.run();
+            System.out.println("CONNECTION TO HOST ESTABLISHED");
+            return true;
+        }
+        return false;
     }
 
     private boolean sendAccMessage() {

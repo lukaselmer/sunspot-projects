@@ -31,8 +31,8 @@ public class SimpleHost implements Runnable {
     private Thread clientListenerThread;
     private ClientListener clientListener;
     private List<String> clients = new ArrayList<String>();
-    private final Game game;
-    private final Thread gameThread;
+    private Game game;
+    private Thread gameThread;
 //    private Map<String, ConnectionSender> connectionSenders = new HashMap<String, ConnectionSender>();
 //    private Map<String, Thread> connectionSenderThreads = new HashMap<String, Thread>();
 //    private ConnectionChecker connectionChecker;
@@ -50,9 +50,9 @@ public class SimpleHost implements Runnable {
         clientListenerThread = new Thread(clientListener);
         clientListenerThread.start();
 
-        game = new Game();
-        gameThread = new Thread(game);
-        gameThread.start();
+//        game = new Game();
+//        gameThread = new Thread(game);
+//        gameThread.start();
 
 //        connectionChecker = new ConnectionChecker(this);
 //        connectionCheckerThread = new Thread(connectionChecker);

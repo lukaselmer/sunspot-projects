@@ -19,6 +19,18 @@ public final class LedsHelper {
     private LedsHelper() {
     }
 
+    public static void setColor(int i, LEDColor c) {
+        leds[i].setColor(c);
+    }
+
+    public static void setOn(int i) {
+        leds[i].setOn();
+    }
+
+    public static void setOff(int i) {
+        leds[i].setOff();
+    }
+
     private static Object[][] getState() {
         Object[][] state = new Object[leds.length][];
         for (int i = 0; i < state.length; i++) {
