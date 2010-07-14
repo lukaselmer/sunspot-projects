@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="lib" path="suite/imlet.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="/home/gimo/SunSPOT/sdk/lib/gluegen-rt.jar"/>
+	<classpathentry kind="lib" path="/home/gimo/SunSPOT/sdk/lib/junit.jar"/>
+	<classpathentry kind="lib" path="/home/gimo/SunSPOT/sdk/lib/multihop_common.jar"/>
+	<classpathentry kind="lib" path="/home/gimo/SunSPOT/sdk/lib/networktools_host.jar"/>
+	<classpathentry kind="lib" path="/home/gimo/SunSPOT/sdk/lib/RXTXcomm.jar"/>
+	<classpathentry kind="lib" path="/home/gimo/SunSPOT/sdk/lib/sdcard_device.jar"/>
+	<classpathentry kind="lib" path="/home/gimo/SunSPOT/sdk/lib/signing_host.jar"/>
+	<classpathentry kind="lib" path="/home/gimo/SunSPOT/sdk/lib/socket_proxy_host.jar"/>
+	<classpathentry kind="lib" path="/home/gimo/SunSPOT/sdk/lib/spotclient_host.jar"/>
+	<classpathentry kind="lib" path="/home/gimo/SunSPOT/sdk/lib/spotlib_common.jar"/>
+	<classpathentry kind="lib" path="/home/gimo/SunSPOT/sdk/lib/spotlib_device.jar"/>
+	<classpathentry kind="lib" path="/home/gimo/SunSPOT/sdk/lib/spotlib_host.jar"/>
+	<classpathentry kind="lib" path="/home/gimo/SunSPOT/sdk/lib/spottestframework_device.jar"/>
+	<classpathentry kind="lib" path="/home/gimo/SunSPOT/sdk/lib/squawk_common.jar"/>
+	<classpathentry kind="lib" path="/home/gimo/SunSPOT/sdk/lib/squawk_device.jar"/>
+	<classpathentry kind="lib" path="/home/gimo/SunSPOT/sdk/lib/transducer_device.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
