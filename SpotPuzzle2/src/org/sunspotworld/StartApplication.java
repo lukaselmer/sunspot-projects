@@ -239,7 +239,7 @@ public class StartApplication extends MIDlet {
     public void doDown() {
 //        swap(3, 4);
 //        swap(2, 5);
-        swap(4, 3);
+        swap(2, 5);
     }
 
     /**
