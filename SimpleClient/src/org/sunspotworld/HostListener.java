@@ -57,13 +57,14 @@ public class HostListener implements Runnable {
                     if (server_response[0].equals("connected")) {
                         NetworkUtils.sendMessageToAddress(client.getCurrentHost(), "connected", 45);
                     } else if (server_response[0].equals("set_color")) {
-                        if (server_response[1].equals("red")) {
-                            LedsHelper.setColor(2, LEDColor.RED);
-                        } else if (server_response[1].equals("green")) {
-                            LedsHelper.setColor(2, LEDColor.GREEN);
-                        }
-                        LedsHelper.setOn(2);
-                        NetworkUtils.sendMessageToAddress(client.getCurrentHost(), "ok", 45);
+                        client.setColor(server_response[1]);
+                        //NetworkUtils.sendMessageToAddress(client.getCurrentHost(), "ok", 45);
+                    } else if (server_response[0].equals("set_game_port")) {
+                        LedsHelper.setColor(3, LEDColor.BLUE);
+                        LedsHelper.setOn(3);
+                        int gamePort = Integer.parseInt(server_response[1]);
+                        System.out.println("Set Game port to: " + gamePort);
+                        client.setGamePort(gamePort);
                     } else {
                         System.out.println("UNEXPECTED SERVER COMMAND:");
                         System.out.println(server_response[0]);
@@ -71,6 +72,7 @@ public class HostListener implements Runnable {
                     }
                 }
             }
+        }
 //            } else {
 //                System.out.println("Checking connection...");
 //                String[] ss = NetworkUtils.receiveMessagesFromAddress(client.getCurrentHost(), 1, 43);
@@ -82,6 +84,5 @@ public class HostListener implements Runnable {
 //                }
 //                Utils.sleep(300);
 //            }
-        }
     }
 }

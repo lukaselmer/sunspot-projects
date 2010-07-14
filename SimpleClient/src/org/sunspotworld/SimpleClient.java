@@ -36,6 +36,9 @@ class SimpleClient implements Runnable {
     private ExitListener exitListener;
     private Thread exitListenerThread;
     private IAccelerometer3D iAccelerometer3D = EDemoBoard.getInstance().getAccelerometer();
+    private boolean joinedGame = false;
+    private int gamePort = 0;
+    private LEDColor gameColor;
 
 //    private ConnectionSender connectionSender;
 //    private Thread connectionSenderThread;
@@ -62,6 +65,14 @@ class SimpleClient implements Runnable {
 //        connectionSenderThread = new Thread(connectionSender);
 //        connectionSenderThread.start();
 
+    }
+
+    public int getGamePort() {
+        return gamePort;
+    }
+
+    public void setGamePort(int gamePort) {
+        this.gamePort = gamePort;
     }
 
     public void stopApp() {
@@ -97,12 +108,14 @@ class SimpleClient implements Runnable {
                 if (!connectedToHost()) {
                     connectToHost();
                 } else {
-                    System.out.println("Sending acc message...");
-                    if (!sendAccMessage()) {
-                        System.out.println("Error!");
-                        disconnectFromHost();
-                    } else {
-                        System.out.println("Acc message ok!");
+                    if (joinedGame) {
+                        if (!sendAccMessage()) {
+                            System.out.println("Error sending acc message!");
+                            disconnectFromHost();
+                        } else {
+                            System.out.print(".");
+                        }
+                        Utils.sleep(50);
                     }
                 }
             }
@@ -185,16 +198,28 @@ class SimpleClient implements Runnable {
         try {
             message = "" + iAccelerometer3D.getTiltX() + "," + iAccelerometer3D.getTiltY();
         } catch (IOException ex) {
-            System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-            System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-            System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-            System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAA");
             System.out.println("Accelerometer problem: ");
             ex.printStackTrace();
             return false;
         }
-        boolean success = NetworkUtils.sendMessageToBroadcast(message, 61);
-        Utils.sleep(150);
+        boolean success = NetworkUtils.sendMessageToBroadcast(message, gamePort);
         return success;
+    }
+
+    void setColor(String color) {
+        if (color.equals("red")) {
+            gameColor = LEDColor.RED;
+            joinedGame = true;
+        } else if (color.equals("green")) {
+            gameColor = LEDColor.GREEN;
+            joinedGame = true;
+        } else {
+            gameColor = LEDColor.YELLOW;
+            System.out.println("WRONG COLOR!!!! " + color);
+            System.out.println("WRONG COLOR!!!! " + color);
+            System.out.println("WRONG COLOR!!!! " + color);
+        }
+        leds[2].setColor(gameColor);
+        leds[2].setOn();
     }
 }

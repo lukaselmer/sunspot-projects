@@ -3,6 +3,9 @@ package org.sunspotworld.game;
 import com.sun.spot.io.j2me.radiogram.Radiogram;
 import com.sun.spot.io.j2me.radiogram.RadiogramConnection;
 import com.sun.spot.peripheral.NoRouteException;
+import java.util.PriorityQueue;
+import java.util.Queue;
+import java.util.concurrent.PriorityBlockingQueue;
 import javax.microedition.io.Connector;
 import javax.swing.JFrame;
 import org.sunspotworld.NetworkUtils;
@@ -16,6 +19,7 @@ public class Game implements Runnable {
     private GridPanel gridPanel;
     private JFrame f;
     private String client1, client2;
+    private Queue<GameMove> movements = new PriorityBlockingQueue<GameMove>();
 
     public Game(String client) {
         addClient(client);
@@ -28,7 +32,7 @@ public class Game implements Runnable {
         f.setVisible(true);
     }
 
-    public String addClient(String client) {
+    public final String addClient(String client) {
         if (Configuration.random.nextBoolean()) {
             this.client1 = client;
             return getColor(client);
@@ -60,6 +64,10 @@ public class Game implements Runnable {
         return client.equals(client1) || client.equals(client2);
     }
 
+    public boolean open() {
+        return client1 == null || client2 == null;
+    }
+
     public boolean hasClient() {
         return client1 != null || client2 != null;
     }
@@ -72,36 +80,23 @@ public class Game implements Runnable {
         this.client2 = client2;
     }
 
+    public void addMovement(double x, double y, String client) {
+        movements.add(new GameMove(x, y, client));
+    }
+
     public void run() {
         while (hasClient()) {
-            try {
-                RadiogramConnection conn = (RadiogramConnection) Connector.open("radiogram://:61");
-                Radiogram rdg = (Radiogram) conn.newDatagram(conn.getMaximumLength());
-
-                try {
-                    conn.receive(rdg);
-                    String s = rdg.readUTF();
-                    String accArr[] = s.split(",");
-
-                    double x = Double.parseDouble(accArr[0]);
-                    double y = Double.parseDouble(accArr[1]);
-                    //double x = rdg.readDouble(), y = rdg.readDouble();
-
-                    System.out.println("xtilt: " + x + ", ytilt: " + y);
-
-                    move(x, y * (-1.0), rdg.getAddress());
-
-                    gridPanel.repaint();
-                    gridPanel.check();
-                } catch (NoRouteException e) {
-                } finally {
-                    conn.close();
+            while (!movements.isEmpty()) {
+                GameMove m = movements.poll();
+                if (m != null) {
+                    move(m.x, m.y * (-1.0), m.client);
                 }
-            } catch (Exception e) {
-                System.out.println("Exception in Game.java: ");
-                e.printStackTrace();
             }
+            gridPanel.repaint();
+            gridPanel.check();
         }
+        f.dispose();
+        f = null;
     }
 
     private void move(double x, double y, String address) {
