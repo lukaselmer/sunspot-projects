@@ -67,9 +67,9 @@ public class StartApplication extends MIDlet {
     private IScalarInput[] axis = EDemoBoard.getInstance().getScalarInputs();
     private ITriColorLED[] leds = EDemoBoard.getInstance().getLEDs();
     /** holds the current state of the puzzle */
-    private int[][] puzzle = new int[leds.length][3];
+    private LEDColor[] puzzle = new LEDColor[leds.length];
     /** holds the solved state of the puzzle */
-    public final int[][] reference = new int[leds.length][3];
+    public final LEDColor[] reference = new LEDColor[leds.length];
     private double[] zeroOffset = {465.5, 465.5, 465.5};     // default zero offset for raw accelerator value
     private double[] sensitivity = {186.2, 186.2, 186.2};    // default conversion factor from raw accelerator value to G's
     //private double[] movement;
@@ -83,7 +83,10 @@ public class StartApplication extends MIDlet {
      * MIDlet call to start the application.
      */
     protected void startApp() throws MIDletStateChangeException {
-        LedsHelper.blink();
+        setupPuzzle(puzzle);
+        setupPuzzle(reference);
+
+        LedsHelper.blink(null);
 
         exitListener = new ExitListener(this);
         exitListenerThread = new Thread(exitListener);
@@ -93,77 +96,23 @@ public class StartApplication extends MIDlet {
         showSolutionListenerThread = new Thread(showSolutionListener);
         showSolutionListenerThread.start();
 
-        determineZeroPoint();
-        setupPuzzle(puzzle);
-        setupPuzzle(reference);
-        blink(5);
         randomize();
         playGame();
-    }
-
-    private double[] getMovement(double[] d) {
-        if (d == null) {
-            d = new double[3];
-        }
-        for (int t = 0; t < 3; t++) {
-            try {
-                d[t] = (axis[t].getValue() - zeroOffset[t]) / sensitivity[t];
-            } catch (IOException ex) {
-                d[t] = 0;
-            }
-        }
-        return d;
-    }
-
-    /**
-     * Calibrates the game by waiting until the spot does not
-     * move anymore (assuming its on a horizontal position).
-     */
-    private void determineZeroPoint() {
-        double delta;
-        double[] d = new double[3];
-        double[] last = new double[3];
-        boolean stable = false;
-        // Indicate calibrating with a red led.
-        leds[0].setRGB(255, 0, 0);
-        leds[0].setOn();
-        do {
-            try {
-                for (int t = 0; t < 3; t++) {
-                    d[t] = axis[t].getValue();
-                }
-                delta = 0;
-                for (int t = 0; t < 3; t++) {
-                    delta = delta + Math.abs(d[t] - last[t]);
-                }
-                stable = delta < 0.01;
-                for (int t = 0; t < 3; t++) {
-                    last[t] = d[t];
-                }
-                Utils.sleep(100);
-            } catch (IOException ex) {
-                stable = false;
-            }
-        } while (!stable);
-        //
-        leds[0].setOff();
-        // Store the new offset
-        zeroOffset = d;
     }
 
     /**
      * sets up the puzzle by storing the rainbow color values in the
      * given array.
      */
-    private void setupPuzzle(int[][] p) {
-        p[0] = new int[]{255, 0, 0};
-        p[1] = new int[]{128, 64, 0};
-        p[2] = new int[]{64, 128, 0};
-        p[3] = new int[]{0, 255, 0};
-        p[4] = new int[]{0, 128, 64};
-        p[5] = new int[]{0, 64, 128};
-        p[6] = new int[]{0, 0, 255};
-        p[7] = new int[]{128, 0, 128};
+    private void setupPuzzle(LEDColor[] p) {
+        p[0] = new LEDColor(255, 0, 0);
+        p[1] = new LEDColor(128, 64, 0);
+        p[2] = new LEDColor(64, 128, 0);
+        p[3] = new LEDColor(0, 255, 0);
+        p[4] = new LEDColor(0, 128, 64);
+        p[5] = new LEDColor(0, 64, 128);
+        p[6] = new LEDColor(0, 0, 255);
+        p[7] = new LEDColor(128, 0, 128);
         updateLeds();
     }
 
@@ -174,7 +123,7 @@ public class StartApplication extends MIDlet {
      */
     private void randomize() {
         Random r = new Random(System.currentTimeMillis());
-        for (int t = 0; t < 16; t++) {
+        for (int t = 0; t < 32; t++) {
             switch (Math.abs(r.nextInt()) % 4) {
                 case 0:
                     doShiftLeft();
@@ -217,33 +166,6 @@ public class StartApplication extends MIDlet {
         }
     }
 
-//    double x = accel.getTiltX(), y = accel.getTiltY();
-//
-//        movement = getMovement(movement);
-//        //
-//        boolean xHalt = Math.abs(movement[X]) < LIMIT;
-//        boolean yHalt = Math.abs(movement[Y]) < LIMIT;
-//        boolean zHalt = Math.abs(movement[Z]) < LIMIT;
-//        //
-//        boolean left = movement[X] < -LIMIT && zHalt && yHalt;
-//        boolean right = movement[X] > LIMIT && zHalt && yHalt;
-//        boolean up = movement[Y] < -LIMIT && zHalt && xHalt;
-//        boolean down = movement[Y] > LIMIT && zHalt && xHalt;
-//        //
-//        if (left) {
-//            return ACTION_SHIFTLEFT;
-//        }
-//        if (right) {
-//            return ACTION_SHIFTRIGHT;
-//        }
-//        if (up) {
-//            return ACTION_UP;
-//        }
-//        if (down) {
-//            return ACTION_DOWN;
-//        }
-//        //
-//        return ACTION_NONE;
     /**
      * Main game loop, get the player action, perform it, update the screen,
      * check if the player has solved the puzzle. Repeat until infinity.
@@ -279,7 +201,7 @@ public class StartApplication extends MIDlet {
                     updateLeds();
                 }
                 if (isSolved()) {
-                    blink(5);
+                    LedsHelper.blink(null);
                     randomize();
                 }
                 Utils.sleep(250);
@@ -294,10 +216,8 @@ public class StartApplication extends MIDlet {
      */
     private boolean isSolved() {
         for (int t = 0; t < puzzle.length; t++) {
-            for (int y = 0; y < 3; y++) {
-                if (puzzle[t][y] != reference[t][y]) {
-                    return false;
-                }
+            if (!puzzle[t].equals(reference[t])) {
+                return false;
             }
         }
         return true;
@@ -326,7 +246,7 @@ public class StartApplication extends MIDlet {
      * swaps two puzzle positions.
      */
     protected void swap(int s, int d) {
-        int[] tmp = puzzle[s];
+        LEDColor tmp = puzzle[s];
         puzzle[s] = puzzle[d];
         puzzle[d] = tmp;
     }
@@ -335,7 +255,7 @@ public class StartApplication extends MIDlet {
      * shifts the leds to the left
      */
     private void doShiftLeft() {
-        int[] tmp = puzzle[0];
+        LEDColor tmp = puzzle[0];
         for (int t = 0; t < puzzle.length - 1; t++) {
             puzzle[t] = puzzle[t + 1];
         }
@@ -346,7 +266,7 @@ public class StartApplication extends MIDlet {
      * shifts the leds to the right
      */
     private void doShiftRight() {
-        int[] tmp = puzzle[puzzle.length - 1];
+        LEDColor tmp = puzzle[puzzle.length - 1];
         for (int t = puzzle.length - 1; t > 0; t--) {
             puzzle[t] = puzzle[t - 1];
         }
@@ -359,31 +279,20 @@ public class StartApplication extends MIDlet {
     private void updateLeds() {
         for (int t = 0; t < puzzle.length; t++) {
             leds[t].setOn();
-            leds[t].setRGB(puzzle[t][0], puzzle[t][1], puzzle[t][2]);
+            leds[t].setColor(puzzle[t]);
         }
         Utils.sleep(50);
     }
 
-    /**
-     * blinks the leds for the specified number of times.
-     */
-    private void blink(int nr) {
-        for (int t = 0; t < nr; t++) {
-            for (int y = 0; y < leds.length; y++) {
-                leds[y].setOn();
-            }
-            Utils.sleep(600);
-            for (int y = 0; y < leds.length; y++) {
-                leds[y].setOff();
-            }
-            Utils.sleep(400);
-        }
-    }
-
     public void exit() {
         pauseApp();
+        try {
+            exitListenerThread.interrupt();
+            showSolutionListenerThread.interrupt();
+        } catch (Exception ex) {
+        }
         LedsHelper.sneake(LEDColor.CYAN);
-        LedsHelper.blink();
+        LedsHelper.blink(null);
         LedsHelper.sneake();
         notifyDestroyed();
     }

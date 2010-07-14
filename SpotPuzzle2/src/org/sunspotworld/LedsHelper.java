@@ -11,16 +11,16 @@ import com.sun.spot.util.Utils;
  */
 public final class LedsHelper {
 
-    public static final int BLINK_TIMES = 10, BLINKING_TIME = 50, SNEAKING_TIME = 150;
-    public static final LEDColor BLINK_COLOR = LEDColor.BLUE, SNEAKING_COLOR = LEDColor.GREEN;
+    public static final int BLINK_TIMES = 20, BLINKING_TIME = 100, SNEAKING_TIME = 150;
+    public static final LEDColor BLINK_COLOR = null, SNEAKING_COLOR = LEDColor.GREEN;
     private static ITriColorLED[] leds = EDemoBoard.getInstance().getLEDs();
     public static final boolean SNEAKING_DIRECTION = true;
 
-    static void setTempColors(int[][] colors, int millisecondsToSleep) {
+    static void setTempColors(LEDColor[] colors, int millisecondsToSleep) {
         Object[][] state = getState();
         for (int i = 0; i < colors.length; i++) {
             leds[i].setOn(true);
-            leds[i].setRGB(colors[i][0], colors[i][1], colors[i][2]);
+            leds[i].setColor(colors[i]);
         }
         Utils.sleep(millisecondsToSleep);
         setState(state);
@@ -69,8 +69,10 @@ public final class LedsHelper {
 
     public static void blink(LEDColor color, int times, int blinkingTime) {
         Object[][] state = getState();
-        for (int j = 0; j < leds.length; j++) {
-            leds[j].setColor(color);
+        if (color != null) {
+            for (int j = 0; j < leds.length; j++) {
+                leds[j].setColor(color);
+            }
         }
         for (int i = 0; i < (times * 2); i++) {
             for (int j = 0; j < leds.length; j++) {

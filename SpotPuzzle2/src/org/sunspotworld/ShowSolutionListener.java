@@ -2,6 +2,7 @@ package org.sunspotworld;
 
 import com.sun.spot.sensorboard.EDemoBoard;
 import com.sun.spot.sensorboard.peripheral.ISwitch;
+import com.sun.spot.util.Utils;
 
 /**
  *
@@ -20,9 +21,10 @@ class ShowSolutionListener implements Runnable {
         while (true) {
             if (sw1.isClosed()) {
                 midlet.pauseApp();
-                LedsHelper.setTempColors(midlet.reference, 1000);
+                LedsHelper.setTempColors(midlet.reference, 2500);
                 midlet.resumeApp();
             }
+            Utils.sleep(50);
         }
     }
 }
