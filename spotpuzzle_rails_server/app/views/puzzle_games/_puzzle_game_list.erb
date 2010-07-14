@@ -1,0 +1,15 @@
+<table>
+  <tr>
+    <th>Anzahl Aktionen</th>
+    <th>Spieldauer</th>
+    <th>Gespielt am</th>
+  </tr>
+
+  <% puzzle_games.each do |puzzle_game| %>
+    <tr>
+      <td><%= puzzle_game.swap_times %></td>
+      <td><%= puzzle_game.cycle_times %></td>
+      <td><%= l puzzle_game.created_at %></td>
+    </tr>
+  <% end %>
+</table>

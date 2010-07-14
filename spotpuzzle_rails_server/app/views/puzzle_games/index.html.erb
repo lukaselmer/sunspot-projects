@@ -1,0 +1,20 @@
+<h1>Puzzle Spiel Statistik</h1>
+<br />
+<h2>Schnellste</h2>
+<%= render 'puzzle_game_list', :puzzle_games => @fastest_puzzle_games %>
+<br />
+
+<h2>Langsamste</h2>
+<%= render 'puzzle_game_list', :puzzle_games => @slowest_puzzle_games %>
+<br />
+
+<h2>Kleinste Anzahl Aktionen</h2>
+<%= render 'puzzle_game_list', :puzzle_games => @fewest_swaps_puzzle_games %>
+<br />
+
+<h2>Grösste Anzahl Aktionen</h2>
+<%= render 'puzzle_game_list', :puzzle_games => @most_swaps_puzzle_games %>
+<br />
+
+<h2>Neuste</h2>
+<%= render 'puzzle_game_list', :puzzle_games => @puzzle_games %>
