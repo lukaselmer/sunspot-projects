@@ -24,7 +24,7 @@ public class SunSpotHostApplication {
         JFrame f = new JFrame();
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         f.getContentPane().add(gridPanel);
-        f.setSize(400, 400);
+        f.setSize(800, 800);
         f.setLocation(200, 200);
         f.setVisible(true);
         System.out.println("Done!");
@@ -32,7 +32,7 @@ public class SunSpotHostApplication {
         while (true) {
             try {
                 System.out.println("Open host...");
-                RadiogramConnection conn = (RadiogramConnection) Connector.open("radiogram://:10");
+                RadiogramConnection conn = (RadiogramConnection) Connector.open("radiogram://:60");
                 Radiogram rdg = (Radiogram) conn.newDatagram(conn.getMaximumLength());
                 System.out.println("Done!");
 

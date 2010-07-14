@@ -25,10 +25,10 @@ import javax.microedition.midlet.MIDletStateChangeException;
 class SimpleClient implements Runnable {
 
     private String ownAddress;
-    private ITriColorLED[] leds = EDemoBoard.getInstance().getLEDs();
+//    private ITriColorLED[] leds = EDemoBoard.getInstance().getLEDs();
     private StartApplication midlet;
-    ISwitch sw1 = EDemoBoard.getInstance().getSwitches()[EDemoBoard.SW1];
-    ISwitch sw2 = EDemoBoard.getInstance().getSwitches()[EDemoBoard.SW2];
+//    ISwitch sw1 = EDemoBoard.getInstance().getSwitches()[EDemoBoard.SW1];
+//    ISwitch sw2 = EDemoBoard.getInstance().getSwitches()[EDemoBoard.SW2];
     private HostListener hostListener;
     private Thread hostListenerThread;
     private boolean connected = false;
@@ -54,9 +54,9 @@ class SimpleClient implements Runnable {
         hostListenerThread = new Thread(hostListener);
         hostListenerThread.start();
 
-        exitListener = new ExitListener(this);
-        exitListenerThread = new Thread(exitListener);
-        exitListenerThread.start();
+//        exitListener = new ExitListener(this);
+//        exitListenerThread = new Thread(exitListener);
+//        exitListenerThread.start();
 
 //        connectionSender = new ConnectionSender(this);
 //        connectionSenderThread = new Thread(connectionSender);
@@ -65,6 +65,7 @@ class SimpleClient implements Runnable {
     }
 
     public void stopApp() {
+        ITriColorLED[] leds = EDemoBoard.getInstance().getLEDs();
         for (int i = 0; i < 8; i++) {
             leds[i].setRGB(100, 0, 0);
             leds[i].setOn();
@@ -89,6 +90,7 @@ class SimpleClient implements Runnable {
     }
 
     public void run() {
+        ITriColorLED[] leds = EDemoBoard.getInstance().getLEDs();
         leds[0].setRGB(0, 0, 100);
         leds[0].setOn();
 
@@ -96,7 +98,11 @@ class SimpleClient implements Runnable {
         while (true) {
             if (connectedToHost()) {
                 try {
-                    NetworkUtils.sendMessageToAddress(currentHost, "" + iAccelerometer3D.getTiltX() + "," + iAccelerometer3D.getTiltY(), 60);
+                    String message = "" + iAccelerometer3D.getTiltX() + "," + iAccelerometer3D.getTiltY();
+                    if (!NetworkUtils.sendMessageToAddress(currentHost, message, 60)) {
+                        disconnectFromHost();
+                    }
+                    Utils.sleep(50);
                 } catch (IOException ex) {
                     disconnectFromHost();
                     ex.printStackTrace();

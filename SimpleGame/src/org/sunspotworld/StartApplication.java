@@ -37,7 +37,7 @@ public class StartApplication extends MIDlet {
         while (sw1.isOpen()) {
             try {
                 System.out.println("Connecting and sending movements...");
-                RadiogramConnection conn = (RadiogramConnection) Connector.open("radiogram://0014.4F01.0000.5B1B:10");
+                RadiogramConnection conn = (RadiogramConnection) Connector.open("radiogram://0014.4F01.0000.5B1B:60");
                 System.out.println("Done 1");
                 Radiogram rdg = (Radiogram) conn.newDatagram(conn.getMaximumLength());
                 System.out.println("Done 2");

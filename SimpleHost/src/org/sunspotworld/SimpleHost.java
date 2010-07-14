@@ -102,7 +102,7 @@ public class SimpleHost implements Runnable {
             }
             System.out.println("---");
             System.out.println("");
-            Utils.sleep(2000);
+            Utils.sleep(5000);
         }
     }
 }

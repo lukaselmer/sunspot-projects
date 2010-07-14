@@ -6,6 +6,7 @@ public class PlayBoard {
     public int xPos2 = 4, yPos2 = 4;
 
     public PlayBoard() {
+        check();
     }
 
     public void move1(int x, int y) {
@@ -31,7 +32,6 @@ public class PlayBoard {
         }
 
         System.out.println("x1: " + x + " y1: " + y);
-
     }
 
     public void move2(int x, int y) {
@@ -58,11 +58,12 @@ public class PlayBoard {
     }
 
     public boolean check() {
-        if (xPos1 == xPos2 && yPos1 == yPos2) {
-            xPos1 = 4;
-            yPos1 = 4;
-            xPos2 = 5;
-            yPos2 = 5;
+        if ((Math.abs(xPos1 - xPos2) <= 2) && (Math.abs(yPos1 - yPos2) <= 2)) {
+            xPos1 = Configuration.getStartXPos1();
+            yPos1 = Configuration.getStartYPos1();
+            xPos2 = Configuration.getStartXPos2();
+            yPos2 = Configuration.getStartYPos2();
+            check();
             return true;
         } else {
             return false;
