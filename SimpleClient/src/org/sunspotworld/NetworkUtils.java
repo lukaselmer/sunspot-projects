@@ -71,7 +71,7 @@ public final class NetworkUtils {
         } catch (IOException ex) {
             System.out.println("Timeout!");
             return false;
-        } catch (java.lang.IllegalArgumentException ex) {
+        } catch (Exception ex) {
             return false;
         }
     }
@@ -101,7 +101,7 @@ public final class NetworkUtils {
         } catch (IOException ex) {
             System.out.println("Timeout!");
             return null;
-        } catch (java.lang.IllegalArgumentException ex) {
+        } catch (Exception ex) {
             return null;
 
         }

@@ -27,7 +27,7 @@ class SimpleClient implements Runnable {
     private String ownAddress;
 //    private ITriColorLED[] leds = EDemoBoard.getInstance().getLEDs();
     private StartApplication midlet;
-//    ISwitch sw1 = EDemoBoard.getInstance().getSwitches()[EDemoBoard.SW1];
+    ISwitch sw1 = EDemoBoard.getInstance().getSwitches()[EDemoBoard.SW1];
 //    ISwitch sw2 = EDemoBoard.getInstance().getSwitches()[EDemoBoard.SW2];
     private HostListener hostListener;
     private Thread hostListenerThread;
@@ -50,13 +50,13 @@ class SimpleClient implements Runnable {
 
         LedsHelper.blink();
 
-        hostListener = new HostListener(this, 40, 41);
-        hostListenerThread = new Thread(hostListener);
-        hostListenerThread.start();
+//        hostListener = new HostListener(this, 40, 41);
+//        hostListenerThread = new Thread(hostListener);
+//        hostListenerThread.start();
 
-//        exitListener = new ExitListener(this);
-//        exitListenerThread = new Thread(exitListener);
-//        exitListenerThread.start();
+        exitListener = new ExitListener(this);
+        exitListenerThread = new Thread(exitListener);
+        exitListenerThread.start();
 
 //        connectionSender = new ConnectionSender(this);
 //        connectionSenderThread = new Thread(connectionSender);
@@ -91,40 +91,18 @@ class SimpleClient implements Runnable {
 
     public void run() {
         ITriColorLED[] leds = EDemoBoard.getInstance().getLEDs();
-        leds[0].setRGB(0, 0, 100);
+        leds[0].setRGB(50, 50, 50);
         leds[0].setOn();
-
-
-        while (true) {
-            if (connectedToHost()) {
-                try {
-                    String message = "" + iAccelerometer3D.getTiltX() + "," + iAccelerometer3D.getTiltY();
-                    if (!NetworkUtils.sendMessageToAddress(currentHost, message, 60)) {
-                        disconnectFromHost();
-                    }
-                    Utils.sleep(50);
-                } catch (IOException ex) {
+        while (sw1.isOpen()) {
+            if (!connectedToHost()) {
+                connectToHost();
+            } else {
+                if (!sendAccMessage()) {
                     disconnectFromHost();
-                    ex.printStackTrace();
                 }
-                //                try {
-                //                    RadiogramConnection conn = (RadiogramConnection) Connector.open("radiogram://" + currentHost + ":" + 60);
-                //                    try {
-                //                        Radiogram rdg = (Radiogram) conn.newDatagram(conn.getMaximumLength());
-                //                        rdg.writeUTF("" + iAccelerometer3D.getTiltX() + "," + iAccelerometer3D.getTiltY());
-                //                        conn.send(rdg);
-                //                        Utils.sleep(100);
-                //                    } catch (NoRouteException e) {
-                //                    } finally {
-                //                        System.out.println("Closing connection");
-                //                        conn.close();
-                //                    }
-                //                } catch (IOException ex) {
-                //                    ex.printStackTrace();
-                //                }
-
             }
         }
+        exit();
     }
 
     public String getOwnAddress() {
@@ -142,12 +120,22 @@ class SimpleClient implements Runnable {
         return connected;
     }
 
-    public void connectToHost(String host) {
+    public void connectToHost(String host, String additionalInfo) {
         if (host != null && host.length() > 0) {
             currentHost = host;
             connected = true;
             System.out.println("Connection established with: " + host);
+            System.out.println("Additional info: " + additionalInfo);
+            System.out.println("CCCCCCCCCCCCCCCCCCCCCCCCCCC");
+            System.out.println("CCCCCCCCCCCCCCCCCCCCCCCCCCC");
+            System.out.println("CCCCCCCCCCCCCCCCCCCCCCCCCCC");
+            System.out.println("CCCCCCCCCCCCCCCCCCCCCCCCCCC");
         } else {
+            System.out.println("Connection lost!");
+            System.out.println("DDDDDDDDDDDDDDDDDDDDDDDDDDD");
+            System.out.println("DDDDDDDDDDDDDDDDDDDDDDDDDDD");
+            System.out.println("DDDDDDDDDDDDDDDDDDDDDDDDDDD");
+            System.out.println("DDDDDDDDDDDDDDDDDDDDDDDDDDD");
             currentHost = null;
             connected = false;
         }
@@ -155,7 +143,7 @@ class SimpleClient implements Runnable {
 
     public void disconnectFromHost() {
         if (connected) {
-            connectToHost(null);
+            connectToHost(null, null);
         }
     }
 
@@ -168,5 +156,26 @@ class SimpleClient implements Runnable {
         LedsHelper.blink();
         LedsHelper.sneake();
         midlet.notifyDestroyed();
+    }
+
+    private void connectToHost() {
+        HostListener h = new HostListener(this, 40, 41, 42);
+        h.run();
+    }
+
+    private boolean sendAccMessage() {
+        String message;
+        try {
+            message = "" + iAccelerometer3D.getTiltX() + "," + iAccelerometer3D.getTiltY();
+        } catch (IOException ex) {
+            System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+            System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+            System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+            System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+            System.out.println("Accelerometer problem: ");
+            ex.printStackTrace();
+            return false;
+        }
+        return NetworkUtils.sendMessageToAddress(currentHost, message, 60);
     }
 }

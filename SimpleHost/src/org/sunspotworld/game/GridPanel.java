@@ -49,21 +49,21 @@ public class GridPanel extends JPanel {
         x1 = PAD + playboard.xPos1 * xInc + 1;
         y1 = PAD + playboard.yPos1 * yInc + 1;
         g2.setPaint(Color.RED);
-        g2.fill(new Ellipse2D.Double(x1 - 15, y1 - 15, xInc + 15, yInc + 15));
+        g2.fill(new Ellipse2D.Double(x1 - 10, y1 - 10, xInc + 15, yInc + 15));
         g2.setPaint(Color.ORANGE);
         g2.fill(new Ellipse2D.Double(x1 - 5, y1 - 5, xInc + 5, yInc + 5));
 
         x1 = PAD + playboard.xPos2 * xInc + 1;
         y1 = PAD + playboard.yPos2 * yInc + 1;
         g2.setPaint(Color.GREEN);
-        g2.fill(new Ellipse2D.Double(x1 - 15, y1 - 15, xInc + 15, yInc + 15));
+        g2.fill(new Ellipse2D.Double(x1 - 10, y1 - 10, xInc + 15, yInc + 15));
         g2.setPaint(Color.CYAN);
         g2.fill(new Ellipse2D.Double(x1 - 5, y1 - 5, xInc + 5, yInc + 5));
     }
 
     public void check() {
         if (playboard.check()) {
-            JOptionPane.showMessageDialog(this, "Caught!!!");
+            JOptionPane.showMessageDialog(this, "Gefangen! Nochmal!?");
         }
     }
 }

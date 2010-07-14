@@ -23,27 +23,33 @@ import javax.microedition.midlet.MIDletStateChangeException;
 public class HostListener implements Runnable {
 
     private SimpleClient client;
+    private final int listeningBroadcastPort;
     private final int listeningPort;
     private final int answerPort;
 
-    public HostListener(SimpleClient client, int listeningPort, int answerPort) {
+    public HostListener(SimpleClient client, int listeningBroadcastPort, int answerPort, int listeningPort) {
         this.client = client;
+        this.listeningBroadcastPort = listeningBroadcastPort;
         this.listeningPort = listeningPort;
         this.answerPort = answerPort;
     }
 
     public void run() {
-        while (true) {
-            if (!client.connectedToHost()) {
-                String[] ss = NetworkUtils.receiveMessagesFromBroadcast(2, listeningPort);
-                if (ss != null) {
-                    String answer = ss[0], hostAddress = ss[1];
-                    if (answer != null && answer.equals("host") && hostAddress != null && hostAddress.length() > 0) {
-                        String[] msgs = {"client_connect", hostAddress, client.getOwnAddress()};
-                        NetworkUtils.sendMessagesToBroadcast(msgs, answerPort);
-                        client.connectToHost(hostAddress);
+        while (!client.connectedToHost()) {
+            String[] ss = NetworkUtils.receiveMessagesFromBroadcast(2, listeningBroadcastPort);
+            if (ss != null) {
+                String answer = ss[0], hostAddress = ss[1];
+                if (answer != null && answer.equals("host")) {
+                    String[] msgs = {"client_connect", hostAddress, client.getOwnAddress()};
+                    NetworkUtils.sendMessagesToAddress(hostAddress, msgs, answerPort);
+                    String[] server_response = NetworkUtils.receiveMessagesFromAddress(hostAddress, 2, listeningPort);
+                    if (server_response != null) {
+                        if (server_response[0].equals("connected")) {
+                            client.connectToHost(hostAddress, server_response[1]);
+                        }
                     }
                 }
+            }
 //            } else {
 //                System.out.println("Checking connection...");
 //                String[] ss = NetworkUtils.receiveMessagesFromAddress(client.getCurrentHost(), 1, 43);
@@ -55,8 +61,6 @@ public class HostListener implements Runnable {
 //                }
 //                Utils.sleep(300);
 //            }
-            }
-            Utils.sleep(1000);
         }
     }
 }

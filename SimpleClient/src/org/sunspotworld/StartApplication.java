@@ -30,10 +30,11 @@ import javax.microedition.midlet.MIDletStateChangeException;
 public class StartApplication extends MIDlet {
 
     private SimpleClient client;
-    private Thread clientThread;
+    private Thread clientThread = null;
 
     protected void startApp() throws MIDletStateChangeException {
         client = new SimpleClient(this);
+        //client.run();
         clientThread = new Thread(client);
         clientThread.start();
     }
@@ -56,14 +57,18 @@ public class StartApplication extends MIDlet {
      *    at this time.
      */
     protected void destroyApp(boolean unconditional) throws MIDletStateChangeException {
-        if (clientThread.isAlive()) {
-            clientThread.interrupt();
-        }
-        client = null;
-        clientThread = null;
-        ITriColorLED[] leds = EDemoBoard.getInstance().getLEDs();
-        for (int i = 0; i < 8; i++) {
-            leds[i].setOff();
+        try {
+            if (clientThread != null && clientThread.isAlive()) {
+                clientThread.interrupt();
+            }
+            client = null;
+            clientThread = null;
+            ITriColorLED[] leds = EDemoBoard.getInstance().getLEDs();
+            for (int i = 0; i < 8; i++) {
+                leds[i].setOff();
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
     }
 }

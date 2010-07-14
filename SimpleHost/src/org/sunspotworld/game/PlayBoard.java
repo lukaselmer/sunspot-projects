@@ -58,7 +58,7 @@ public class PlayBoard {
     }
 
     public boolean check() {
-        if ((Math.abs(xPos1 - xPos2) <= 2) && (Math.abs(yPos1 - yPos2) <= 2)) {
+        if ((Math.abs(xPos1 - xPos2) <= 3) && (Math.abs(yPos1 - yPos2) <= 3)) {
             xPos1 = Configuration.getStartXPos1();
             yPos1 = Configuration.getStartYPos1();
             xPos2 = Configuration.getStartXPos2();
