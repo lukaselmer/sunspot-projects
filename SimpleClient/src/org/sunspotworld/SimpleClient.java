@@ -8,6 +8,8 @@ import com.sun.spot.peripheral.radio.RadioFactory;
 import com.sun.spot.peripheral.radio.IRadioPolicyManager;
 import com.sun.spot.io.j2me.radiostream.*;
 import com.sun.spot.io.j2me.radiogram.*;
+import com.sun.spot.peripheral.NoRouteException;
+import com.sun.spot.sensorboard.peripheral.IAccelerometer3D;
 import com.sun.spot.sensorboard.peripheral.LEDColor;
 import com.sun.spot.util.*;
 
@@ -33,9 +35,10 @@ class SimpleClient implements Runnable {
     private String currentHost = null;
     private ExitListener exitListener;
     private Thread exitListenerThread;
+    private IAccelerometer3D iAccelerometer3D = EDemoBoard.getInstance().getAccelerometer();
+
 //    private ConnectionSender connectionSender;
 //    private Thread connectionSenderThread;
-
     public SimpleClient(StartApplication midlet) {
         System.out.println("Starting client");
         new BootloaderListener().start();   // monitor the USB (if connected) and recognize commands from host
@@ -89,7 +92,32 @@ class SimpleClient implements Runnable {
         leds[0].setRGB(0, 0, 100);
         leds[0].setOn();
 
+
         while (true) {
+            if (connectedToHost()) {
+                try {
+                    NetworkUtils.sendMessageToAddress(currentHost, "" + iAccelerometer3D.getTiltX() + "," + iAccelerometer3D.getTiltY(), 60);
+                } catch (IOException ex) {
+                    disconnectFromHost();
+                    ex.printStackTrace();
+                }
+                //                try {
+                //                    RadiogramConnection conn = (RadiogramConnection) Connector.open("radiogram://" + currentHost + ":" + 60);
+                //                    try {
+                //                        Radiogram rdg = (Radiogram) conn.newDatagram(conn.getMaximumLength());
+                //                        rdg.writeUTF("" + iAccelerometer3D.getTiltX() + "," + iAccelerometer3D.getTiltY());
+                //                        conn.send(rdg);
+                //                        Utils.sleep(100);
+                //                    } catch (NoRouteException e) {
+                //                    } finally {
+                //                        System.out.println("Closing connection");
+                //                        conn.close();
+                //                    }
+                //                } catch (IOException ex) {
+                //                    ex.printStackTrace();
+                //                }
+
+            }
         }
     }
 
