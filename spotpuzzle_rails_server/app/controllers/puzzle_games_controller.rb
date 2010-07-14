@@ -2,17 +2,20 @@ class PuzzleGamesController < ApplicationController
   # GET /puzzle_games
   # GET /puzzle_games.xml
   def index
-    @fastest_puzzle_games = PuzzleGame.fastest
-    @slowest_puzzle_games = PuzzleGame.slowest
-    @fewest_swaps_puzzle_games = PuzzleGame.fewest_swaps
-    @most_swaps_puzzle_games = PuzzleGame.most_swaps
+    @fastest_puzzle_games = PuzzleGame.fastest.paginate(:page => 1, :per_page => 23)
+    @slowest_puzzle_games = PuzzleGame.slowest.paginate(:page => 1, :per_page => 23)
+    @fewest_swaps_puzzle_games = PuzzleGame.fewest_swaps.paginate(:page => 1, :per_page => 23)
+    @most_swaps_puzzle_games = PuzzleGame.most_swaps.paginate(:page => 1, :per_page => 23)
     @puzzle_games = PuzzleGame.latest
-    @puzzle_games *= 20
+    @puzzle_games *= 50
 
-    respond_to do |format|
-      format.html # index.html.erb
-      format.xml  { render :xml => @puzzle_games }
-    end
+    @puzzle_games = @puzzle_games.paginate(:page => params[:page] || 1, :per_page => 23)
+
+    #    respond_to do |format|
+    #      format.html # index.html.erb
+    #      format.rjs # index.html.rjs
+    #      format.xml  { render :xml => @puzzle_games }
+    #    end
   end
 
   # GET /puzzle_games/1

@@ -1,11 +1,8 @@
 <h1>Puzzle Spiel Statistik</h1>
 <br />
 <div>
+  <%= render 'puzzle_games_big' %>
   <div class="fl">
-    <h2>Die Neusten</h2>
-    <%= render 'puzzle_game_list', :puzzle_games => @puzzle_games %>
-  </div>
-  <div class="fl" style="margin: 0 0 0 70px;">
     <h2>Die Schnellsten</h2>
     <%= render 'puzzle_game_list', :puzzle_games => @fastest_puzzle_games %>
     <br />
