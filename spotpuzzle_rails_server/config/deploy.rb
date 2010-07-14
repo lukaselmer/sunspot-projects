@@ -32,9 +32,14 @@ set :use_sudo, false
 
 
 desc "Link all the imporant files"
-task :link_tipish_files, :except => { :no_release => true } do
+task :link_files, :except => { :no_release => true } do
   run "ln -nfs #{shared_path}/public/.htaccess #{release_path}/public/.htaccess"
   run "ln -nfs #{shared_path}/config/database.yml #{release_path}/config/database.yml"
+end
+
+desc "Chowns to user www-data"
+task :chown_for_www_data, :except => { :no_release => true } do
+  run "chown -R www-data:www-data #{shared_path}/ #{release_path}/"
 end
 
 namespace :deploy do
@@ -43,4 +48,5 @@ namespace :deploy do
   task :restart, :roles => :app, :except => { :no_release => true } do
     run "#{try_sudo} touch #{File.join(current_path,'tmp','restart.txt')}"
   end
+  after "link_files", "chown_for_www_data"
 end
