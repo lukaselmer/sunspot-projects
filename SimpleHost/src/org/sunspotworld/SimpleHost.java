@@ -17,6 +17,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.microedition.io.*;
 import javax.rmi.CORBA.Util;
+import org.sunspotworld.game.Game;
 
 /**
  *
@@ -30,6 +31,8 @@ public class SimpleHost implements Runnable {
     private Thread clientListenerThread;
     private ClientListener clientListener;
     private List<String> clients = new ArrayList<String>();
+    private final Game game;
+    private final Thread gameThread;
 //    private Map<String, ConnectionSender> connectionSenders = new HashMap<String, ConnectionSender>();
 //    private Map<String, Thread> connectionSenderThreads = new HashMap<String, Thread>();
 //    private ConnectionChecker connectionChecker;
@@ -46,6 +49,10 @@ public class SimpleHost implements Runnable {
         clientListener = new ClientListener(this);
         clientListenerThread = new Thread(clientListener);
         clientListenerThread.start();
+
+        game = new Game();
+        gameThread = new Thread(game);
+        gameThread.start();
 
 //        connectionChecker = new ConnectionChecker(this);
 //        connectionCheckerThread = new Thread(connectionChecker);
