@@ -94,6 +94,8 @@ public class StartApplication extends MIDlet {
         setupPuzzle(puzzle);
         setupPuzzle(reference);
 
+        new ResultTransmitter().transmit(10, 20, 2);
+
         LedsHelper.setOff();
         LedsHelper.sneake();
         LedsHelper.blink(null);
