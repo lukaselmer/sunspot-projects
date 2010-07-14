@@ -1,5 +1,6 @@
 package org.sunspotworld;
 
+import com.sun.spot.flashmanagement.FlashFile;
 import com.sun.spot.peripheral.Spot;
 import com.sun.spot.sensorboard.EDemoBoard;
 import com.sun.spot.sensorboard.peripheral.ISwitch;
@@ -21,6 +22,10 @@ import java.io.*;
 import javax.microedition.io.*;
 import javax.microedition.midlet.MIDlet;
 import javax.microedition.midlet.MIDletStateChangeException;
+import javax.microedition.rms.RecordStore;
+import javax.microedition.rms.RecordStoreException;
+import javax.microedition.rms.RecordStoreFullException;
+import javax.microedition.rms.RecordStoreNotOpenException;
 
 /**
  * A motion controlled Puzzle for the SunSPOT (Green SDK)
@@ -71,14 +76,15 @@ public class StartApplication extends MIDlet {
     private LEDColor[] puzzle = new LEDColor[leds.length];
     /** holds the solved state of the puzzle */
     public final LEDColor[] reference = new LEDColor[leds.length];
-    private double[] zeroOffset = {465.5, 465.5, 465.5};     // default zero offset for raw accelerator value
-    private double[] sensitivity = {186.2, 186.2, 186.2};    // default conversion factor from raw accelerator value to G's
+    //private double[] zeroOffset = {465.5, 465.5, 465.5};     // default zero offset for raw accelerator value
+    //private double[] sensitivity = {186.2, 186.2, 186.2};    // default conversion factor from raw accelerator value to G's
     //private double[] movement;
     private ExitListener exitListener;
     private Thread exitListenerThread;
     private ShowSolutionListener showSolutionListener;
     private Thread showSolutionListenerThread;
     private boolean paused = false;
+    private int swapTimes = 0, cycleTimes = 0, gameTimes = 0;
 
     /**
      * MIDlet call to start the application.
@@ -193,13 +199,23 @@ public class StartApplication extends MIDlet {
                     updateLeds();
                 }
                 if (isSolved()) {
-                    LedsHelper.blink(null);
-                    randomize();
+                    resetGame();
                 }
                 Utils.sleep(250);
                 lastAction = action;
             }
         }
+    }
+
+    private void resetGame() {
+        pauseApp();
+        LedsHelper.blink(null);
+        new ResultTransmitter().transmit(swapTimes, cycleTimes, ++gameTimes);
+        saveGameTimes();
+        swapTimes = 0;
+        cycleTimes = 0;
+        resumeApp();
+        randomize();
     }
 
     /**
@@ -303,6 +319,17 @@ public class StartApplication extends MIDlet {
             for (int i = 0; i < 8; i++) {
                 leds[i].setOff();
             }
+        } catch (Exception ex) {
+        }
+    }
+
+    private void saveGameTimes() {
+        try {
+            RecordStore.deleteRecordStore("gametimes");
+            RecordStore rms = RecordStore.openRecordStore("gametimes", true);
+            byte[] inputData = {new Integer(gameTimes).byteValue()};
+            int recordId = rms.addRecord(inputData, 0, inputData.length);
+            rms.closeRecordStore();
         } catch (Exception ex) {
         }
     }
