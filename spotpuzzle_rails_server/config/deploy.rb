@@ -5,7 +5,7 @@ set :domain, 'puzzle.elmermx.ch'
 
 set :scm, :subversion
 # Or: `accurev`, `bzr`, `cvs`, `darcs`, `git`, `mercurial`, `perforce`, `subversion` or `none`
-set :scm_username, 'elmer'
+#set :scm_username, 'elmer'
 
 role :web, domain
 role :app, domain
@@ -48,5 +48,5 @@ namespace :deploy do
   task :restart, :roles => :app, :except => { :no_release => true } do
     run "#{try_sudo} touch #{File.join(current_path,'tmp','restart.txt')}"
   end
-  after "link_files", "chown_for_www_data"
+  after "deploy:finalize_update", "link_files", "chown_for_www_data"
 end
