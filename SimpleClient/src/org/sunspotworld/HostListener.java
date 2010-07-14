@@ -57,13 +57,13 @@ public class HostListener implements Runnable {
                     if (server_response[0].equals("connected")) {
                         NetworkUtils.sendMessageToAddress(client.getCurrentHost(), "connected", 45);
                     } else if (server_response[0].equals("set_color")) {
-                        //String[] resp = server_response[1].split(",");
                         if (server_response[1].equals("red")) {
                             LedsHelper.setColor(2, LEDColor.RED);
                         } else if (server_response[1].equals("green")) {
                             LedsHelper.setColor(2, LEDColor.GREEN);
                         }
                         LedsHelper.setOn(2);
+                        NetworkUtils.sendMessageToAddress(client.getCurrentHost(), "ok", 45);
                     } else {
                         System.out.println("UNEXPECTED SERVER COMMAND:");
                         System.out.println(server_response[0]);

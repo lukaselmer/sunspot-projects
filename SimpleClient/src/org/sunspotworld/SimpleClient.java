@@ -142,6 +142,7 @@ class SimpleClient implements Runnable {
             System.out.println("Connection lost!");
             currentHost = null;
             connected = false;
+            leds[1].setColor(LEDColor.RED);
             leds[1].setOff();
         }
     }
@@ -164,13 +165,19 @@ class SimpleClient implements Runnable {
     }
 
     private boolean connectToHost() {
-        if (!connectedToHost()) {
-            HostListener h = new HostListener(this, 40, 41, 42);
-            h.run();
-            System.out.println("CONNECTION TO HOST ESTABLISHED");
-            return true;
+//        if (!connectedToHost()) {
+//            HostListener h = new HostListener(this, 40, 41, 42);
+//            h.run();
+//            System.out.println("CONNECTION TO HOST ESTABLISHED");
+//            return true;
+//        }
+//        return false;
+        if (hostListener == null) {
+            hostListener = new HostListener(this, 40, 41, 42);
+            hostListenerThread = new Thread(hostListener);
+            hostListenerThread.start();
         }
-        return false;
+        return connectedToHost();
     }
 
     private boolean sendAccMessage() {
@@ -186,6 +193,8 @@ class SimpleClient implements Runnable {
             ex.printStackTrace();
             return false;
         }
-        return NetworkUtils.sendMessageToAddress(currentHost, message, 60);
+        boolean success = NetworkUtils.sendMessageToBroadcast(message, 61);
+        Utils.sleep(150);
+        return success;
     }
 }

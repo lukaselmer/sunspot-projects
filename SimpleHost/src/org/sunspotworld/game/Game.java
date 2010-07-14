@@ -5,6 +5,7 @@ import com.sun.spot.io.j2me.radiogram.RadiogramConnection;
 import com.sun.spot.peripheral.NoRouteException;
 import javax.microedition.io.Connector;
 import javax.swing.JFrame;
+import org.sunspotworld.NetworkUtils;
 
 /**
  *
@@ -14,21 +15,67 @@ public class Game implements Runnable {
 
     private GridPanel gridPanel;
     private JFrame f;
+    private String client1, client2;
 
-    public Game() {
+    public Game(String client) {
+        addClient(client);
         gridPanel = new GridPanel();
         f = new JFrame();
-        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        f.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         f.getContentPane().add(gridPanel);
         f.setSize(800, 800);
         f.setLocation(200, 200);
         f.setVisible(true);
     }
 
+    public String addClient(String client) {
+        if (Configuration.random.nextBoolean()) {
+            this.client1 = client;
+            return getColor(client);
+        } else {
+            this.client2 = client;
+            return getColor(client);
+        }
+    }
+
+    public String getColor(String client) {
+        if (client.equals(client1)) {
+            return "red";
+        } else if (client.equals(client2)) {
+            return "green";
+        } else {
+            return null;
+        }
+    }
+
+    public void removeClient(String client) {
+        if (client.equals(client1)) {
+            client1 = null;
+        } else if (client.equals(client2)) {
+            client2 = null;
+        }
+    }
+
+    public boolean hasClient(String client) {
+        return client.equals(client1) || client.equals(client2);
+    }
+
+    public boolean hasClient() {
+        return client1 != null || client2 != null;
+    }
+
+    public void setClient1(String client1) {
+        this.client1 = client1;
+    }
+
+    public void setClient2(String client2) {
+        this.client2 = client2;
+    }
+
     public void run() {
-        while (true) {
+        while (hasClient()) {
             try {
-                RadiogramConnection conn = (RadiogramConnection) Connector.open("radiogram://broadcast:60");
+                RadiogramConnection conn = (RadiogramConnection) Connector.open("radiogram://:61");
                 Radiogram rdg = (Radiogram) conn.newDatagram(conn.getMaximumLength());
 
                 try {
@@ -51,7 +98,7 @@ public class Game implements Runnable {
                     conn.close();
                 }
             } catch (Exception e) {
-                System.out.println("Exception: ");
+                System.out.println("Exception in Game.java: ");
                 e.printStackTrace();
             }
         }
@@ -77,12 +124,13 @@ public class Game implements Runnable {
             y += movementPerDraw;
         }
 
-        if (true || address.equals("0014.4F01.0000.5B1B")) {
+        if (address.equals(client1)) {
             gridPanel.playboard.move1(passx, passy);
-        } else if (address.equals("0014.4F01.0000.5D94")) {
+        } else if (address.equals(client2)) {
             gridPanel.playboard.move2(passx, passy);
         } else {
             System.out.println("Other address: " + address);
+            System.out.println("XXXXXXXXXXXXXXXXXXXXXX");
         }
         if (Math.abs(x) > movementPerDraw || Math.abs(y) > movementPerDraw) {
             move(x, y, address);

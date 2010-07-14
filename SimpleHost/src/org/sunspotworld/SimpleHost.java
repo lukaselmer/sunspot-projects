@@ -78,6 +78,16 @@ public class SimpleHost implements Runnable {
 //            connectionSenders.put(client, connectionSender);
 //            connectionSenderThreads.put(client, connectionSenderThread);
 //        }
+        if (game == null) {
+            game = new Game(client);
+            gameThread = new Thread(game);
+            gameThread.start();
+            sendColorToClient(client, game.getColor(client));
+        } else {
+            if (clients.size() == 1) {
+                game.setClient2(client);
+            }
+        }
         return clients.add(client);
     }
 
@@ -88,7 +98,15 @@ public class SimpleHost implements Runnable {
     public boolean removeClient(String client) {
 //        connectionSenders.remove(client).setInactive();
 //        connectionSenderThreads.remove(client);
-        return clients.remove(client);
+        boolean clientExisted = clients.remove(client);
+        if (clientExisted) {
+            if (clients.isEmpty()) {
+                gameThread.interrupt();
+                gameThread = null;
+                game = null;
+            }
+        }
+        return clientExisted;
     }
 
     public void run() {
@@ -104,5 +122,10 @@ public class SimpleHost implements Runnable {
             System.out.println("");
             Utils.sleep(5000);
         }
+    }
+
+    private void sendColorToClient(String client, String color) {
+        String[] ss = {"set_color", color};
+        NetworkUtils.sendMessagesToAddress(client, ss, 44);
     }
 }
