@@ -48,7 +48,8 @@ public class StartApplication extends MIDlet {
     /** index of the blue component of the led */
     private static final int BLUE = 2;
     /** minimal value for the accelerometer */
-    private static final double LIMIT = 0.2;
+    private static final double MINIMAL_ACCELERATION_X = 0.2;
+    private static final double MINIMAL_ACCELERATION_Y = 0.3;
     /** indicates no player action */
     private static final int ACTION_NONE = 0;
     /** indicates the player wants to shift the leds to the left */
@@ -83,9 +84,12 @@ public class StartApplication extends MIDlet {
      * MIDlet call to start the application.
      */
     protected void startApp() throws MIDletStateChangeException {
+        new BootloaderListener().start();   // monitor the USB (if connected) and recognize commands from host
         setupPuzzle(puzzle);
         setupPuzzle(reference);
 
+        LedsHelper.setOff();
+        LedsHelper.sneake();
         LedsHelper.blink(null);
 
         exitListener = new ExitListener(this);
@@ -105,15 +109,15 @@ public class StartApplication extends MIDlet {
      * given array.
      */
     private void setupPuzzle(LEDColor[] p) {
-        p[0] = new LEDColor(255, 0, 0);
-        p[1] = new LEDColor(128, 64, 0);
-        p[2] = new LEDColor(64, 128, 0);
-        p[3] = new LEDColor(0, 255, 0);
-        p[4] = new LEDColor(0, 128, 64);
-        p[5] = new LEDColor(0, 64, 128);
-        p[6] = new LEDColor(0, 0, 255);
-        p[7] = new LEDColor(128, 0, 128);
-        updateLeds();
+        p[0] = LEDColor.RED;
+        p[1] = LEDColor.ORANGE;
+        p[2] = LEDColor.YELLOW;
+        p[3] = LEDColor.GREEN;
+        p[4] = LEDColor.TURQUOISE;
+        p[5] = LEDColor.BLUE;
+        p[6] = LEDColor.MAGENTA;
+        p[7] = LEDColor.WHITE;
+        updateLeds(0);
     }
 
     /**
@@ -124,20 +128,7 @@ public class StartApplication extends MIDlet {
     private void randomize() {
         Random r = new Random(System.currentTimeMillis());
         for (int t = 0; t < 32; t++) {
-            switch (Math.abs(r.nextInt()) % 4) {
-                case 0:
-                    doShiftLeft();
-                    break;
-                case 1:
-                    doUp();
-                    break;
-                case 2:
-                    doDown();
-                    break;
-                case 3:
-                    doShiftRight();
-                    break;
-            }
+            swap(r.nextInt(8), r.nextInt(8));
             updateLeds();
         }
     }
@@ -151,14 +142,15 @@ public class StartApplication extends MIDlet {
             double y = accel.getTiltY();
 
             int action = ACTION_NONE;
-            if (x < -LIMIT) {
+            if (x < -MINIMAL_ACCELERATION_X) {
                 action = ACTION_SHIFTLEFT;
-            } else if (x > LIMIT) {
+            } else if (x > MINIMAL_ACCELERATION_X) {
                 action = ACTION_SHIFTRIGHT;
-            } else if (y < -LIMIT) {
+            } else if (y < -MINIMAL_ACCELERATION_Y) {
                 action = ACTION_UP;
-            } else if (x < -LIMIT) {
-                action = ACTION_DOWN;
+            } else if (x < MINIMAL_ACCELERATION_Y) {
+                //action = ACTION_DOWN;
+                action = ACTION_NONE;
             }
             return action;
         } catch (IOException ex) {
@@ -239,7 +231,7 @@ public class StartApplication extends MIDlet {
     public void doDown() {
 //        swap(3, 4);
 //        swap(2, 5);
-        swap(2, 5);
+        swap(4, 3);
     }
 
     /**
@@ -273,15 +265,16 @@ public class StartApplication extends MIDlet {
         puzzle[0] = tmp;
     }
 
-    /**
-     * updates the leds and waits a short while.
-     */
     private void updateLeds() {
+        updateLeds(50);
+    }
+
+    private void updateLeds(int millisecondsToWait) {
         for (int t = 0; t < puzzle.length; t++) {
             leds[t].setOn();
             leds[t].setColor(puzzle[t]);
         }
-        Utils.sleep(50);
+        Utils.sleep(millisecondsToWait);
     }
 
     public void exit() {

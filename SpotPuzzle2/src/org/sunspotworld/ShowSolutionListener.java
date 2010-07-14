@@ -23,8 +23,9 @@ class ShowSolutionListener implements Runnable {
                 midlet.pauseApp();
                 LedsHelper.setTempColors(midlet.reference, 2500);
                 midlet.resumeApp();
+            } else {
+                Utils.sleep(50);
             }
-            Utils.sleep(50);
         }
     }
 }
