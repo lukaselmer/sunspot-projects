@@ -10,6 +10,7 @@ import com.sun.spot.io.j2me.radiostream.*;
 import com.sun.spot.io.j2me.radiogram.*;
 import com.sun.spot.sensorboard.io.IScalarInput;
 import com.sun.spot.sensorboard.peripheral.IAccelerometer3D;
+import com.sun.spot.sensorboard.peripheral.LEDColor;
 import com.sun.spot.util.*;
 
 
@@ -68,15 +69,30 @@ public class StartApplication extends MIDlet {
     /** holds the current state of the puzzle */
     private int[][] puzzle = new int[leds.length][3];
     /** holds the solved state of the puzzle */
-    private int[][] reference = new int[leds.length][3];
+    public final int[][] reference = new int[leds.length][3];
     private double[] zeroOffset = {465.5, 465.5, 465.5};     // default zero offset for raw accelerator value
     private double[] sensitivity = {186.2, 186.2, 186.2};    // default conversion factor from raw accelerator value to G's
-    private double[] movement;
+    //private double[] movement;
+    private ExitListener exitListener;
+    private Thread exitListenerThread;
+    private ShowSolutionListener showSolutionListener;
+    private Thread showSolutionListenerThread;
+    private boolean paused = false;
 
     /**
      * MIDlet call to start the application.
      */
     protected void startApp() throws MIDletStateChangeException {
+        LedsHelper.blink();
+
+        exitListener = new ExitListener(this);
+        exitListenerThread = new Thread(exitListener);
+        exitListenerThread.start();
+
+        showSolutionListener = new ShowSolutionListener(this);
+        showSolutionListenerThread = new Thread(showSolutionListener);
+        showSolutionListenerThread.start();
+
         determineZeroPoint();
         setupPuzzle(puzzle);
         setupPuzzle(reference);
@@ -185,24 +201,17 @@ public class StartApplication extends MIDlet {
             double x = accel.getTiltX();
             double y = accel.getTiltY();
 
-            boolean left = movement[X] < -LIMIT && zHalt && yHalt;
-            boolean right = movement[X] > LIMIT && zHalt && yHalt;
-            boolean up = movement[Y] < -LIMIT && zHalt && xHalt;
-            boolean down = movement[Y] > LIMIT && zHalt && xHalt;
-            //
-            if (left) {
-                return ACTION_SHIFTLEFT;
+            int action = ACTION_NONE;
+            if (x < -LIMIT) {
+                action = ACTION_SHIFTLEFT;
+            } else if (x > LIMIT) {
+                action = ACTION_SHIFTRIGHT;
+            } else if (y < -LIMIT) {
+                action = ACTION_UP;
+            } else if (x < -LIMIT) {
+                action = ACTION_DOWN;
             }
-            if (right) {
-                return ACTION_SHIFTRIGHT;
-            }
-            if (up) {
-                return ACTION_UP;
-            }
-            if (down) {
-                return ACTION_DOWN;
-            }
-            return ACTION_NONE;
+            return action;
         } catch (IOException ex) {
             return ACTION_NONE;
         }
@@ -235,8 +244,6 @@ public class StartApplication extends MIDlet {
 //        }
 //        //
 //        return ACTION_NONE;
-
-
     /**
      * Main game loop, get the player action, perform it, update the screen,
      * check if the player has solved the puzzle. Repeat until infinity.
@@ -244,34 +251,40 @@ public class StartApplication extends MIDlet {
     private void playGame() {
         int lastAction = ACTION_NONE;
         while (true) {
-            int action = getPlayerAction();
-            switch (action) {
-                case ACTION_NONE:
-                    break;
-                case ACTION_SHIFTLEFT:
-                    doShiftLeft();
-                    break;
-                case ACTION_SHIFTRIGHT:
-                    doShiftRight();
-                    break;
-            }
-            if (action != lastAction) {
+            if (paused) {
+                Utils.sleep(50);
+            } else {
+                int action = getPlayerAction();
                 switch (action) {
-                    case ACTION_UP:
-                        doUp();
+                    case ACTION_NONE:
                         break;
-                    case ACTION_DOWN:
-                        doDown();
+                    case ACTION_SHIFTLEFT:
+                        doShiftLeft();
+                        break;
+                    case ACTION_SHIFTRIGHT:
+                        doShiftRight();
                         break;
                 }
+                if (action != lastAction) {
+                    switch (action) {
+                        case ACTION_UP:
+                            doUp();
+                            break;
+                        case ACTION_DOWN:
+                            doDown();
+                            break;
+                    }
+                }
+                if (action != ACTION_NONE) {
+                    updateLeds();
+                }
+                if (isSolved()) {
+                    blink(5);
+                    randomize();
+                }
+                Utils.sleep(250);
+                lastAction = action;
             }
-            updateLeds();
-            if (isSolved()) {
-                blink(5);
-                randomize();
-            }
-            Utils.sleep(250);
-            lastAction = action;
         }
     }
 
@@ -294,8 +307,9 @@ public class StartApplication extends MIDlet {
      * performs the up move, swaps the middle for leds.
      */
     public void doUp() {
-        swap(2, 4);
-        swap(3, 5);
+//        swap(2, 4);
+//        swap(3, 5);
+        swap(3, 4);
     }
 
     /**
@@ -303,8 +317,9 @@ public class StartApplication extends MIDlet {
      * different way.
      */
     public void doDown() {
-        swap(3, 4);
-        swap(2, 5);
+//        swap(3, 4);
+//        swap(2, 5);
+        swap(4, 3);
     }
 
     /**
@@ -365,11 +380,28 @@ public class StartApplication extends MIDlet {
         }
     }
 
+    public void exit() {
+        pauseApp();
+        LedsHelper.sneake(LEDColor.CYAN);
+        LedsHelper.blink();
+        LedsHelper.sneake();
+        notifyDestroyed();
+    }
+
     protected void pauseApp() {
-        // This will never be called by the Squawk VM
+        paused = true;
+    }
+
+    protected void resumeApp() {
+        paused = false;
     }
 
     protected void destroyApp(boolean arg0) throws MIDletStateChangeException {
-        // Only called if startApp throws any exception other than MIDletStateChangeException
+        try {
+            for (int i = 0; i < 8; i++) {
+                leds[i].setOff();
+            }
+        } catch (Exception ex) {
+        }
     }
 }
