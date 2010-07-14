@@ -22,7 +22,6 @@ class ClientListener implements Runnable {
 
     public void run() {
         while (true) {
-            System.out.println("Listening for clinets...");
             String[] ss = NetworkUtils.receiveMessagesFromBroadcast(3, 41);
             if (ss != null) {
                 String type = ss[0], hostAddress = ss[1], clientAddress = ss[2];

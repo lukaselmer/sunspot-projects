@@ -77,11 +77,10 @@ public class SimpleHost implements Runnable {
 
     public boolean addClient(String client) {
         if (containsClient(client)) {
+            if (gamesContains(client)) {
+                sendColorToClient(client, getGameByClient(client).getColor(client));
+            }
             return false;
-        }
-
-        if (gamesContains(client)) {
-            sendColorToClient(client, getGameByClient(client).getColor(client));
         } else {
             Game openGame = getOpenGame();
             if (openGame == null) {
@@ -123,24 +122,25 @@ public class SimpleHost implements Runnable {
 
     public void run() {
         while (true) {
-            System.out.println("");
-            System.out.println("---");
             System.out.println("" + clients.size() + " clients connected, " + games.size() + " games started.");
-            for (int i = 0; i < clients.size(); i++) {
-                String client = clients.get(i);
-                System.out.println("Client " + i + ": " + client);
-            }
-            System.out.println("---");
             System.out.println("");
-            Utils.sleep(5000);
+            Utils.sleep(10000);
         }
     }
 
     private void sendColorToClient(String client, String color) {
         String[] ss = {"set_color", color};
-        while (!NetworkUtils.sendMessagesToAddress(client, ss, 44));
+        System.out.println("Sending color...");
+        while (!NetworkUtils.sendMessagesToAddress(client, ss, 44)) {
+            System.out.println("Retry...");
+        }
+        System.out.println("Done!");
+        System.out.println("Sending port...");
         String[] ss2 = {"set_game_port", "61"};
-        while (!NetworkUtils.sendMessagesToAddress(client, ss2, 44));
+        while (!NetworkUtils.sendMessagesToAddress(client, ss2, 44)) {
+            System.out.println("Retry...");
+        }
+        System.out.println("Done!");
     }
 
     public Game getGameByClient(String client) {

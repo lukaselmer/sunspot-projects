@@ -63,15 +63,13 @@ public final class NetworkUtils {
                 conn.send(dg);
             } catch (IOException ex) {
                 conn.close();
-                System.out.println("Timeout!");
                 return false;
             }
             conn.close();
             return true;
         } catch (IOException ex) {
-            System.out.println("Timeout!");
             return false;
-        } catch (Exception ex) {
+        } catch (java.lang.IllegalArgumentException ex) {
             return false;
         }
     }
@@ -95,13 +93,11 @@ public final class NetworkUtils {
                 return answers;
             } catch (IOException ex) {
                 recvConn.close();
-                System.out.println("Timeout!");
                 return null;
             }
         } catch (IOException ex) {
-            System.out.println("Timeout!");
             return null;
-        } catch (Exception ex) {
+        } catch (java.lang.IllegalArgumentException ex) {
             return null;
 
         }

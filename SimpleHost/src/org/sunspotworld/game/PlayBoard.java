@@ -31,7 +31,7 @@ public class PlayBoard {
             }
         }
 
-        System.out.println("x1: " + x + " y1: " + y);
+        //System.out.println("x1: " + x + " y1: " + y);
     }
 
     public void move2(int x, int y) {
