@@ -7,6 +7,7 @@ class PuzzleGamesController < ApplicationController
     @fewest_swaps_puzzle_games = PuzzleGame.fewest_swaps
     @most_swaps_puzzle_games = PuzzleGame.most_swaps
     @puzzle_games = PuzzleGame.latest
+    @puzzle_games *= 20
 
     respond_to do |format|
       format.html # index.html.erb

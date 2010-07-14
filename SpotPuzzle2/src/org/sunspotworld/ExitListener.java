@@ -34,7 +34,7 @@ public class ExitListener implements Runnable {
                 if (sw2.isClosed()) {
                     midlet.exit();
                 }
-                Utils.sleep(50);
+                Utils.sleep(100);
             }
         } catch (Exception ex) {
         }

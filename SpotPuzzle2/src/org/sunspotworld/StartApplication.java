@@ -85,16 +85,25 @@ public class StartApplication extends MIDlet {
     private Thread showSolutionListenerThread;
     private boolean paused = false;
     private int swapTimes = 0, cycleTimes = 0, gameTimes = 0;
+    private Thread resultTransmitterThread;
+    private ResultTransmitter resultTransmitter;
+    private static Random random = new Random();
 
     /**
      * MIDlet call to start the application.
      */
     protected void startApp() throws MIDletStateChangeException {
         new BootloaderListener().start();   // monitor the USB (if connected) and recognize commands from host
+
+        resultTransmitter = new ResultTransmitter();
+        resultTransmitterThread = new Thread(resultTransmitter);
+        resultTransmitterThread.start();
+        for (int i = 0; i < 20; i++) {
+            resultTransmitter.addStatistics(50 + random.nextInt(150), 50 + random.nextInt(150), i);
+        }
+
         setupPuzzle(puzzle);
         setupPuzzle(reference);
-
-        new ResultTransmitter().transmit(10, 20, 2);
 
         LedsHelper.setOff();
         LedsHelper.sneake();
@@ -134,9 +143,8 @@ public class StartApplication extends MIDlet {
      * is solvable.
      */
     private void randomize() {
-        Random r = new Random(System.currentTimeMillis());
         for (int t = 0; t < 32; t++) {
-            swap(r.nextInt(8), r.nextInt(8));
+            swap(random.nextInt(8), random.nextInt(8));
             updateLeds();
         }
     }
@@ -205,6 +213,7 @@ public class StartApplication extends MIDlet {
                 }
                 Utils.sleep(250);
                 lastAction = action;
+                cycleTimes++;
             }
         }
     }
@@ -212,8 +221,7 @@ public class StartApplication extends MIDlet {
     private void resetGame() {
         pauseApp();
         LedsHelper.blink(null);
-        new ResultTransmitter().transmit(swapTimes, cycleTimes, ++gameTimes);
-        saveGameTimes();
+        saveGameStatistics(swapTimes, cycleTimes, ++gameTimes);
         swapTimes = 0;
         cycleTimes = 0;
         resumeApp();
@@ -240,6 +248,7 @@ public class StartApplication extends MIDlet {
 //        swap(2, 4);
 //        swap(3, 5);
         swap(3, 4);
+        swapTimes++;
     }
 
     /**
@@ -250,6 +259,7 @@ public class StartApplication extends MIDlet {
 //        swap(3, 4);
 //        swap(2, 5);
         swap(4, 3);
+        swapTimes++;
     }
 
     /**
@@ -325,7 +335,7 @@ public class StartApplication extends MIDlet {
         }
     }
 
-    private void saveGameTimes() {
+    private void saveGameStatistics(int swapTimes, int cycleTimes, int gameTimes) {
         try {
             RecordStore.deleteRecordStore("gametimes");
             RecordStore rms = RecordStore.openRecordStore("gametimes", true);
@@ -334,5 +344,6 @@ public class StartApplication extends MIDlet {
             rms.closeRecordStore();
         } catch (Exception ex) {
         }
+        resultTransmitter.addStatistics(swapTimes, cycleTimes, gameTimes);
     }
 }
