@@ -6,7 +6,7 @@ class PuzzleGamesController < ApplicationController
     @slowest_puzzle_games = PuzzleGame.slowest.paginate(:page => 1, :per_page => 3)
     @fewest_swaps_puzzle_games = PuzzleGame.fewest_swaps.paginate(:page => 1, :per_page => 3)
     @most_swaps_puzzle_games = PuzzleGame.most_swaps.paginate(:page => 1, :per_page => 3)
-    @puzzle_games = PuzzleGame.latest.paginate(:page => params[:page] || 1, :per_page => 3)
+    @puzzle_games = PuzzleGame.latest.paginate(:page => params[:page] || 1, :per_page => 30)
 
     #    respond_to do |format|
     #      format.html # index.html.erb
