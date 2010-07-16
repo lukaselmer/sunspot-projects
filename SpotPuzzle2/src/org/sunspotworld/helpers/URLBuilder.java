@@ -22,23 +22,20 @@ public class URLBuilder {
     }
 
     public URLBuilder add(String attribute, String value) {
-        attrs.put("'" + attribute + "'", value);
+        attrs.put(attribute, value);
         return this;
     }
 
     public URLBuilder add(String attribute, int value) {
-        attrs.put(attribute, "" + value);
-        return this;
+        return add(attribute, "" + value);
     }
 
     public URLBuilder add(String attribute, double value) {
-        attrs.put(attribute, "" + value);
-        return this;
+        return add(attribute, "" + value);
     }
 
     public URLBuilder add(String attribute, long value) {
-        attrs.put(attribute, "" + value);
-        return this;
+        return add(attribute, "" + value);
     }
 
     public URLBuilder add(String attribute, boolean value) {
@@ -51,7 +48,7 @@ public class URLBuilder {
         for (Enumeration e = attrs.keys(); e.hasMoreElements();) {
             String key = (String) e.nextElement();
             String value = (String) attrs.get(key);
-            ret += model + "[" + key + "]";
+            ret += model + "[" + key + "]=" + value;
             if (e.hasMoreElements()) {
                 ret += "&";
             }

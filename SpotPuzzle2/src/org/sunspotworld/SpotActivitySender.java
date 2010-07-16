@@ -33,7 +33,7 @@ public class SpotActivitySender implements Runnable {
     }
 
     private String getUrlForSensors() {
-        URLBuilder b = URLBuilder.build("spot_activity", "spot_activities").add("address", address).
+        URLBuilder b = URLBuilder.build("spot_activity", "spot_activities.xml").add("address", address).
                 add("time_in_milliseconds", System.currentTimeMillis()).add("sw1", switches[0].isOpen()).add("sw2", switches[1].isOpen());
         try {
             b.add("light", light.getAverageValue());

@@ -70,7 +70,7 @@ public class HttpRequstSender implements Runnable {
             return false;
         }
         try {
-            RadiogramConnection conn = (RadiogramConnection) Connector.open("radiogram://" + hostFinder.getHost() + ":40" /*, Connector.READ_WRITE, true*/);
+            RadiogramConnection conn = (RadiogramConnection) Connector.open("radiogram://" + hostFinder.getHost() + ":40", Connector.READ_WRITE, true);
             Datagram dg = conn.newDatagram(conn.getMaximumLength());
             try {
                 dg.writeUTF(url);
@@ -84,7 +84,7 @@ public class HttpRequstSender implements Runnable {
                 conn.close();
             }
         } catch (Exception ex) {
-            //ex.printStackTrace();
+            hostFinder.resetHost();
         }
         return success;
     }
