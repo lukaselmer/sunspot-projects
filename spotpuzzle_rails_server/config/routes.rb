@@ -1,4 +1,6 @@
 ActionController::Routing::Routes.draw do |map|
+  map.resources :spot_activities
+
   map.resources :puzzle_games
 
   # The priority is based upon order of creation: first created -> highest priority.

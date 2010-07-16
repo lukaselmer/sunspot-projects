@@ -9,11 +9,20 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20100714180208) do
+ActiveRecord::Schema.define(:version => 20100716144954) do
 
   create_table "puzzle_games", :force => true do |t|
     t.integer  "swap_times"
     t.integer  "cycle_times"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "spot_activities", :force => true do |t|
+    t.string   "address"
+    t.integer  "light"
+    t.boolean  "sw1"
+    t.boolean  "sw2"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

@@ -1,0 +1,52 @@
+<h1>Listing spot_activities</h1>
+
+<table>
+  <tr>
+    <th>Address</th>
+    <th>Time in milliseconds</th>
+    <th>Celsius</th>
+    <th>Light</th>
+    <th>Sw1</th>
+    <th>Sw2</th>
+    <th>Accel</th>
+    <th>Accelx</th>
+    <th>Accely</th>
+    <th>Accelz</th>
+    <th>Rel accel</th>
+    <th>Rel accelx</th>
+    <th>Rel accely</th>
+    <th>Rel accelz</th>
+    <th>Tiltx</th>
+    <th>Tilty</th>
+    <th>Tiltz</th>
+  </tr>
+
+<% @spot_activities.each do |spot_activity| %>
+  <tr>
+    <td><%=h spot_activity.address %></td>
+    <td><%=h spot_activity.time_in_milliseconds %></td>
+    <td><%=h spot_activity.celsius %></td>
+    <td><%=h spot_activity.light %></td>
+    <td><%=h spot_activity.sw1 %></td>
+    <td><%=h spot_activity.sw2 %></td>
+    <td><%=h spot_activity.accel %></td>
+    <td><%=h spot_activity.accelx %></td>
+    <td><%=h spot_activity.accely %></td>
+    <td><%=h spot_activity.accelz %></td>
+    <td><%=h spot_activity.rel_accel %></td>
+    <td><%=h spot_activity.rel_accelx %></td>
+    <td><%=h spot_activity.rel_accely %></td>
+    <td><%=h spot_activity.rel_accelz %></td>
+    <td><%=h spot_activity.tiltx %></td>
+    <td><%=h spot_activity.tilty %></td>
+    <td><%=h spot_activity.tiltz %></td>
+    <td><%= link_to 'Show', spot_activity %></td>
+    <td><%= link_to 'Edit', edit_spot_activity_path(spot_activity) %></td>
+    <td><%= link_to 'Destroy', spot_activity, :confirm => 'Are you sure?', :method => :delete %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New spot_activity', new_spot_activity_path %>
