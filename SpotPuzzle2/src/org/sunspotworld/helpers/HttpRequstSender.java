@@ -44,8 +44,10 @@ public class HttpRequstSender implements Runnable {
         enabled = false;
     }
 
-    public void addRequest(String url) {
-        requests.enqueue(url);
+    public void addRequest(String url, boolean important) {
+        if (important || requests.size() < 15) {
+            requests.enqueue(url);
+        }
     }
 
     private void doHttpRequst(Vector urls) {

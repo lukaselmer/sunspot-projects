@@ -19,6 +19,9 @@ public class HttpHelper {
     }
 
     public static void addRequst(String url) {
-        sender.addRequest(url);
+        addRequst(url, true);
+    }
+    public static void addRequst(String url, boolean important) {
+        sender.addRequest(url, important);
     }
 }
