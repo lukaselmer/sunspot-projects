@@ -2,7 +2,7 @@ class SpotActivitiesController < ApplicationController
   # GET /spot_activities
   # GET /spot_activities.xml
   def index
-    @spot_activities = SpotActivity.all
+    @spot_activities = SpotActivity.all :order => 'id DESC'
 
     respond_to do |format|
       format.html # index.html.erb

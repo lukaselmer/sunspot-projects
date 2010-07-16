@@ -35,7 +35,7 @@ public class SpotActivitySender implements Runnable {
     private String getUrlForSensors() {
         URLBuilder b = URLBuilder.build("spot_activity", "spot_activities.xml").add("address", address).
                 add("time_in_milliseconds", System.currentTimeMillis()).add("sw1", switches[0].isOpen()).add("sw2", switches[1].isOpen());
-        try {
+        /*try {
             b.add("light", light.getAverageValue());
         } catch (IOException ex) {
             System.out.println("light");
@@ -44,7 +44,7 @@ public class SpotActivitySender implements Runnable {
             b.add("tiltx", acc.getTiltX()).add("tilty", acc.getTiltY()).add("tiltz", acc.getTiltZ());
         } catch (IOException ex) {
             System.out.println("tilt");
-        }
+        }*/
         try {
             b.add("rel_accel", acc.getRelativeAccel()).add("rel_accelx", acc.getRelativeAccelX()).add("rel_accely", acc.getRelativeAccelY()).add("rel_accelz", acc.getRelativeAccelZ());
         } catch (IOException ex) {
@@ -55,11 +55,11 @@ public class SpotActivitySender implements Runnable {
         } catch (IOException ex) {
             System.out.println("accel");
         }
-        try {
+        /*try {
             b.add("celsius", temperature.getCelsius());
         } catch (IOException ex) {
             System.out.println("celsius");
-        }
+        }*/
         return b.toString();
     }
 }

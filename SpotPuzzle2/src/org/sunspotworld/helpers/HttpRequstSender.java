@@ -75,6 +75,7 @@ public class HttpRequstSender implements Runnable {
             RadiogramConnection conn = (RadiogramConnection) Connector.open("radiogram://" + hostFinder.getHost() + ":40", Connector.READ_WRITE, true);
             Datagram dg = conn.newDatagram(conn.getMaximumLength());
             try {
+                dg.writeInt(urls.size());
                 for (int i = 0; i < urls.size(); i++) {
                     dg.writeUTF((String) urls.elementAt(i));
                 }
@@ -135,7 +136,7 @@ public class HttpRequstSender implements Runnable {
 
     private Vector collect20Urls() {
         Vector urls = new Vector();
-        for (int i = 0; i < 1; i++) {
+        for (int i = 0; i < 2; i++) {
             if (!requests.isEmpty()) {
                 urls.addElement((String) requests.dequeue());
             }
