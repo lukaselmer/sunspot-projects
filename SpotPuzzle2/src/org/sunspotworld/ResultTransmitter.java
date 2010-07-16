@@ -11,6 +11,7 @@ import javax.microedition.rms.RecordStore;
 import javax.microedition.rms.RecordStoreException;
 import javax.microedition.rms.RecordStoreFullException;
 import javax.microedition.rms.RecordStoreNotFoundException;
+import org.sunspotworld.helpers.HttpHelper;
 
 /**
  *
@@ -44,50 +45,55 @@ class ResultTransmitter implements Runnable {
     }
 
     synchronized boolean transmit(int swapTimes, int cycleTimes) {
-        boolean worked = false;
-        try {
-            HttpConnection conn = null;
-            long starttime = 0;
-            String resp = null;
-
-            System.out.println("Posting statistics...");
-            try {
-                POSTstatus = CONNECTING;
-                starttime = System.currentTimeMillis();
-                //conn = (HttpConnection) Connector.open("http://127.0.0.1/puzzle_games/");
-                System.out.println("a");
-                conn = (HttpConnection) Connector.open("http://puzzle.elmermx.ch/puzzle_games?puzzle_game[swap_times]=" + swapTimes + "&puzzle_game[cycle_times]=" + cycleTimes + "",
-                        Connector.READ_WRITE, true);
-                conn.setRequestMethod(HttpConnection.POST);
-                System.out.println("a");
-                resp = conn.getResponseMessage();
-                System.out.println("resp = " + resp);
-                if (resp.equals("OK") || resp.equals("Found")) {
-                    POSTstatus = COMPLETED;
-                } else {
-                    POSTstatus = PROTOCOLERROR;
-                }
-            } catch (Exception ex) {
-                POSTstatus = IOERROR;
-                System.out.println("Error transmitting results!");
-            } finally {
-                if (conn != null) {
-                    conn.close();
-                }
-            }
-
-            if (POSTstatus == COMPLETED) {
-                worked = true;
-            } else {
-                System.out.println("Posting failed. Try again later...");
-            }
-            System.out.println("Total time to post " + (System.currentTimeMillis() - starttime) + " ms");
-            System.out.flush();
-        } catch (IOException ex) {
-        }
-        return worked;
+        String url = "http://puzzle.elmermx.ch/puzzle_games?puzzle_game[swap_times]=" + swapTimes + "&puzzle_game[cycle_times]=" + cycleTimes + "";
+        HttpHelper.addRequst(url);
+        return true;
     }
 
+//    synchronized boolean transmit(int swapTimes, int cycleTimes) {
+//        boolean worked = false;
+//        try {
+//            HttpConnection conn = null;
+//            long starttime = 0;
+//            String resp = null;
+//
+//            System.out.println("Posting statistics...");
+//            try {
+//                POSTstatus = CONNECTING;
+//                starttime = System.currentTimeMillis();
+//                //conn = (HttpConnection) Connector.open("http://127.0.0.1/puzzle_games/");
+//                System.out.println("a");
+//                conn = (HttpConnection) Connector.open("http://puzzle.elmermx.ch/puzzle_games?puzzle_game[swap_times]=" + swapTimes + "&puzzle_game[cycle_times]=" + cycleTimes + "",
+//                        Connector.READ_WRITE, true);
+//                conn.setRequestMethod(HttpConnection.POST);
+//                System.out.println("a");
+//                resp = conn.getResponseMessage();
+//                System.out.println("resp = " + resp);
+//                if (resp.equals("OK") || resp.equals("Found")) {
+//                    POSTstatus = COMPLETED;
+//                } else {
+//                    POSTstatus = PROTOCOLERROR;
+//                }
+//            } catch (Exception ex) {
+//                POSTstatus = IOERROR;
+//                System.out.println("Error transmitting results!");
+//            } finally {
+//                if (conn != null) {
+//                    conn.close();
+//                }
+//            }
+//
+//            if (POSTstatus == COMPLETED) {
+//                worked = true;
+//            } else {
+//                System.out.println("Posting failed. Try again later...");
+//            }
+//            System.out.println("Total time to post " + (System.currentTimeMillis() - starttime) + " ms");
+//            System.out.flush();
+//        } catch (IOException ex) {
+//        }
+//        return worked;
+//    }
     public synchronized void addStatistics(int swapTimes, int cycleTimes, int gameTimes) {
         statisticsToSend.addElement(new int[]{swapTimes, cycleTimes, gameTimes});
     }

@@ -1,4 +1,4 @@
-package org.sunspotworld;
+package org.sunspotworld.helpers;
 
 import com.sun.spot.sensorboard.EDemoBoard;
 import com.sun.spot.sensorboard.peripheral.ITriColorLED;
@@ -16,7 +16,7 @@ public final class LedsHelper {
     private static ITriColorLED[] leds = EDemoBoard.getInstance().getLEDs();
     public static final boolean SNEAKING_DIRECTION = true;
 
-    static void setTempColors(LEDColor[] colors, int millisecondsToSleep) {
+    public static void setTempColors(LEDColor[] colors, int millisecondsToSleep) {
         Object[][] state = getState();
         for (int i = 0; i < colors.length; i++) {
             leds[i].setOn(true);

@@ -1,5 +1,6 @@
 package org.sunspotworld;
 
+import org.sunspotworld.helpers.LedsHelper;
 import com.sun.spot.flashmanagement.FlashFile;
 import com.sun.spot.peripheral.Spot;
 import com.sun.spot.sensorboard.EDemoBoard;
@@ -98,7 +99,7 @@ public class StartApplication extends MIDlet {
         resultTransmitter = new ResultTransmitter();
         resultTransmitterThread = new Thread(resultTransmitter);
         resultTransmitterThread.start();
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 50; i++) {
             resultTransmitter.addStatistics(50 + random.nextInt(150), 50 + random.nextInt(150), i);
         }
 

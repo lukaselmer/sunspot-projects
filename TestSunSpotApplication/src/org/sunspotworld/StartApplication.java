@@ -14,6 +14,7 @@ import com.sun.spot.peripheral.radio.RadioFactory;
 import com.sun.spot.peripheral.radio.IRadioPolicyManager;
 import com.sun.spot.io.j2me.radiostream.*;
 import com.sun.spot.io.j2me.radiogram.*;
+import com.sun.spot.sensorboard.peripheral.IAccelerometer3D;
 import com.sun.spot.util.*;
 
 import java.io.*;

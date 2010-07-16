@@ -1,5 +1,6 @@
 package org.sunspotworld;
 
+import org.sunspotworld.helpers.LedsHelper;
 import com.sun.spot.sensorboard.EDemoBoard;
 import com.sun.spot.sensorboard.peripheral.ISwitch;
 import com.sun.spot.util.Utils;
