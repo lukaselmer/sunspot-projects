@@ -45,7 +45,7 @@ public class HttpRequstSender implements Runnable {
     }
 
     public void addRequest(String url, boolean important) {
-        if (important || requests.size() < 15) {
+        if (important || requests.size() < 3) {
             requests.enqueue(url);
         }
     }
