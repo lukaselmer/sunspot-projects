@@ -6,6 +6,7 @@ import com.sun.spot.util.IEEEAddress;
 import com.sun.spot.util.Queue;
 import com.sun.spot.util.Utils;
 import java.io.IOException;
+import java.util.Vector;
 import javax.microedition.io.Connector;
 import javax.microedition.io.Datagram;
 import javax.microedition.io.HttpConnection;
@@ -31,8 +32,9 @@ public class HttpRequstSender implements Runnable {
     public void run() {
         while (enabled) {
             while (!requests.isEmpty()) {
-                String url = (String) requests.dequeue();
-                doHttpRequst(url);
+                Vector urls = collect20Urls();
+                //String url = (String) requests.dequeue();
+                doHttpRequst(urls);
             }
             Utils.sleep(100);
         }
@@ -46,7 +48,7 @@ public class HttpRequstSender implements Runnable {
         requests.enqueue(url);
     }
 
-    private void doHttpRequst(String url) {
+    private void doHttpRequst(Vector urls) {
         if (hostFinder == null) {
             hostFinder = new HostFinder();
             hostFinderThread = new Thread(hostFinder);
@@ -56,14 +58,14 @@ public class HttpRequstSender implements Runnable {
             System.out.println("Not connected to host.");
             Utils.sleep(3000);
         }
-        System.out.println("Transmitting URL '" + url + "'...");
-        while (!transmit(url)) {
-            System.out.println("Transmission of '" + url + "' failed! Trying again...");
+        System.out.print("Queue = " + requests.size() + "; Transmitting URL '" + urls.size() + "'...");
+        while (!transmit(urls)) {
+            System.out.println(" failed! Trying again...");
         }
-        System.out.println("Transmission of '" + url + "' successful!");
+        System.out.println("ok!");
     }
 
-    synchronized boolean transmit(String url) {
+    synchronized boolean transmit(Vector urls) {
         boolean success = false;
         if (!hostFinder.connected()) {
             Utils.sleep(2000);
@@ -73,13 +75,15 @@ public class HttpRequstSender implements Runnable {
             RadiogramConnection conn = (RadiogramConnection) Connector.open("radiogram://" + hostFinder.getHost() + ":40", Connector.READ_WRITE, true);
             Datagram dg = conn.newDatagram(conn.getMaximumLength());
             try {
-                dg.writeUTF(url);
+                for (int i = 0; i < urls.size(); i++) {
+                    dg.writeUTF((String) urls.elementAt(i));
+                }
                 conn.send(dg);
                 conn.receive(dg);
                 String answer = dg.readUTF();
                 success = answer.equals("ok");
             } catch (Exception ex) {
-                //ex.printStackTrace();
+                ex.printStackTrace();
             } finally {
                 conn.close();
             }
@@ -127,5 +131,15 @@ public class HttpRequstSender implements Runnable {
         } catch (IOException ex) {
         }
         return worked;
+    }
+
+    private Vector collect20Urls() {
+        Vector urls = new Vector();
+        for (int i = 0; i < 1; i++) {
+            if (!requests.isEmpty()) {
+                urls.addElement((String) requests.dequeue());
+            }
+        }
+        return urls;
     }
 }
