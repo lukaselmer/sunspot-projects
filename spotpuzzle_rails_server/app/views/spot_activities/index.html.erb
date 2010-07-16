@@ -1,4 +1,23 @@
-<h1>Listing spot_activities</h1>
+<h1>Listing spot activities</h1>
+
+<canvas id="example" width="1200" height="800"></canvas>
+
+<script type="text/javascript">
+  var g = new Bluff.Line('example', '1200x800');
+  g.title = 'Acceleration';
+  g.tooltips = true;
+
+  g.theme_37signals();
+
+<% [:accel,:accelx,:accely,:accelz,:rel_accel,:rel_accelx,:rel_accely,:rel_accelz].each do |type| %>
+  g.data("<%= type.to_s.humanize %>", [<%= @spot_activities.collect(&type).join(',') %>]);
+  <% end %>
+
+
+  //g.labels = {0: '2003', 2: '2004', 4: '2005'};
+
+  g.draw();
+</script>
 
 <table>
   <tr>
@@ -21,30 +40,30 @@
     <th>Tiltz</th>
   </tr>
 
-<% @spot_activities.each do |spot_activity| %>
-  <tr>
-    <td><%=h spot_activity.address %></td>
-    <td><%=h spot_activity.time_in_milliseconds %></td>
-    <td><%=h spot_activity.celsius %></td>
-    <td><%=h spot_activity.light %></td>
-    <td><%=h spot_activity.sw1 %></td>
-    <td><%=h spot_activity.sw2 %></td>
-    <td><%=h spot_activity.accel %></td>
-    <td><%=h spot_activity.accelx %></td>
-    <td><%=h spot_activity.accely %></td>
-    <td><%=h spot_activity.accelz %></td>
-    <td><%=h spot_activity.rel_accel %></td>
-    <td><%=h spot_activity.rel_accelx %></td>
-    <td><%=h spot_activity.rel_accely %></td>
-    <td><%=h spot_activity.rel_accelz %></td>
-    <td><%=h spot_activity.tiltx %></td>
-    <td><%=h spot_activity.tilty %></td>
-    <td><%=h spot_activity.tiltz %></td>
-    <td><%= link_to 'Show', spot_activity %></td>
-    <td><%= link_to 'Edit', edit_spot_activity_path(spot_activity) %></td>
-    <td><%= link_to 'Destroy', spot_activity, :confirm => 'Are you sure?', :method => :delete %></td>
-  </tr>
-<% end %>
+  <% @spot_activities.each do |spot_activity| %>
+    <tr>
+      <td><%=h spot_activity.address %></td>
+      <td><%=h spot_activity.time_in_milliseconds %></td>
+      <td><%=h spot_activity.celsius %></td>
+      <td><%=h spot_activity.light %></td>
+      <td><%=h spot_activity.sw1 %></td>
+      <td><%=h spot_activity.sw2 %></td>
+      <td><%=h spot_activity.accel %></td>
+      <td><%=h spot_activity.accelx %></td>
+      <td><%=h spot_activity.accely %></td>
+      <td><%=h spot_activity.accelz %></td>
+      <td><%=h spot_activity.rel_accel %></td>
+      <td><%=h spot_activity.rel_accelx %></td>
+      <td><%=h spot_activity.rel_accely %></td>
+      <td><%=h spot_activity.rel_accelz %></td>
+      <td><%=h spot_activity.tiltx %></td>
+      <td><%=h spot_activity.tilty %></td>
+      <td><%=h spot_activity.tiltz %></td>
+      <td><%= link_to 'Show', spot_activity %></td>
+      <td><%= link_to 'Edit', edit_spot_activity_path(spot_activity) %></td>
+      <td><%= link_to 'Destroy', spot_activity, :confirm => 'Are you sure?', :method => :delete %></td>
+    </tr>
+  <% end %>
 </table>
 
 <br />

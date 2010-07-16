@@ -20,11 +20,24 @@ ActiveRecord::Schema.define(:version => 20100716144954) do
 
   create_table "spot_activities", :force => true do |t|
     t.string   "address"
+    t.float    "celsius"
     t.integer  "light"
     t.boolean  "sw1"
     t.boolean  "sw2"
+    t.float    "accel"
+    t.float    "accelx"
+    t.float    "accely"
+    t.float    "accelz"
+    t.float    "rel_accel"
+    t.float    "rel_accelx"
+    t.float    "rel_accely"
+    t.float    "rel_accelz"
+    t.float    "tiltx"
+    t.float    "tilty"
+    t.float    "tiltz"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.text     "time_in_milliseconds", :limit => 16777215
   end
 
 end
