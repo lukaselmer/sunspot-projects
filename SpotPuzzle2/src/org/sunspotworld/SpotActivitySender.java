@@ -28,7 +28,7 @@ public class SpotActivitySender implements Runnable {
     public void run() {
         while (true) {
             HttpHelper.addRequst(getUrlForSensors());
-            Utils.sleep(1000);
+            Utils.sleep(50);
         }
     }
 
