@@ -24,7 +24,7 @@ public class HttpRequstSender implements Runnable {
     private static int POSTstatus = INACTIVE;
     private SimpleQueue requests = new SimpleQueue();
     private boolean enabled = true;
-    private static String host = null;//"0014.4F01.0000.5B1B";
+    // private static String host = null;//"0014.4F01.0000.5B1B";
     private static HostFinder hostFinder = null;//"0014.4F01.0000.5B1B";
     private static Thread hostFinderThread = null;//"0014.4F01.0000.5B1B";
 
@@ -42,7 +42,7 @@ public class HttpRequstSender implements Runnable {
         enabled = false;
     }
 
-    void addRequest(String url) {
+    public void addRequest(String url) {
         requests.enqueue(url);
     }
 
@@ -51,6 +51,10 @@ public class HttpRequstSender implements Runnable {
             hostFinder = new HostFinder();
             hostFinderThread = new Thread(hostFinder);
             hostFinderThread.start();
+        }
+        while (!hostFinder.connected()) {
+            System.out.println("Not connected to host.");
+            Utils.sleep(3000);
         }
         System.out.println("Transmitting URL '" + url + "'...");
         while (!transmit(url)) {
@@ -61,12 +65,12 @@ public class HttpRequstSender implements Runnable {
 
     synchronized boolean transmit(String url) {
         boolean success = false;
-        if (host == null) {
-            Utils.sleep(10000);
+        if (!hostFinder.connected()) {
+            Utils.sleep(2000);
             return false;
         }
         try {
-            RadiogramConnection conn = (RadiogramConnection) Connector.open("radiogram://" + host + ":40" /*, Connector.READ_WRITE, true*/);
+            RadiogramConnection conn = (RadiogramConnection) Connector.open("radiogram://" + hostFinder.getHost() + ":40" /*, Connector.READ_WRITE, true*/);
             Datagram dg = conn.newDatagram(conn.getMaximumLength());
             try {
                 dg.writeUTF(url);

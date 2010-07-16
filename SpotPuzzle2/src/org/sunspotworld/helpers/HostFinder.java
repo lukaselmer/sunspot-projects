@@ -14,9 +14,9 @@ class HostFinder implements Runnable {
     private String host;
 
     public void run() {
-        while (!hostFound()) {
+        while (!connected()) {
             try {
-                RadiogramConnection conn = (RadiogramConnection) Connector.open("radiogram://:40");
+                RadiogramConnection conn = (RadiogramConnection) Connector.open("radiogram://:41");
                 Datagram dg = conn.newDatagram(conn.getMaximumLength());
                 try {
                     conn.receive(dg);
@@ -35,7 +35,7 @@ class HostFinder implements Runnable {
         }
     }
 
-    private boolean hostFound() {
+    public boolean connected() {
         return host != null;
     }
 
