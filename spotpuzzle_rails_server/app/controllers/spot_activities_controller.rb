@@ -3,6 +3,11 @@ class SpotActivitiesController < ApplicationController
   # GET /spot_activities.xml
   def index
     @spot_activities = SpotActivity.all :order => 'id DESC', :limit => 50
+    @spot_activities_by_address = {}
+    @spot_activities.each do |v|
+      @spot_activities_by_address[v.address] ||= []
+      @spot_activities_by_address[v.address] << v
+    end
 
     respond_to do |format|
       format.html # index.html.erb

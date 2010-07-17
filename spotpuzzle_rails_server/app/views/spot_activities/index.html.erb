@@ -1,28 +1,31 @@
 <h1>Listing spot activities</h1>
 
-<canvas id="example" width="1600" height="1000"></canvas>
+<% @spot_activities_by_address.each do |address, sas| %>
+  <canvas id="<%=h address %>_chart" width="1600" height="1000"></canvas>
 
-<script type="text/javascript">
-  var g = new Bluff.Line('example', '1600x1000');
-  g.title = 'Acceleration';
-  g.tooltips = true;
-  g.dot_radius = 2;
-  g.title_font_size = 15;
-  g.legend_font_size = 9;
-  g.marker_font_size = 10;
-  
+  <script type="text/javascript">
+    var g = new Bluff.Line('<%=h address %>_chart', '1600x1000');
+    g.title = 'Acceleration for <%=h address %>';
+    g.tooltips = true;
+    g.dot_radius = 2;
+    g.title_font_size = 15;
+    g.legend_font_size = 9;
+    g.marker_font_size = 10;
+    g.marker_count = 6;
+    g.theme_37signals();
+    g.add_color("#aaa000");
 
-  g.theme_37signals();
 
-<% [:accel,:accelx,:accely,:accelz,:rel_accel,:rel_accelx,:rel_accely,:rel_accelz].each do |type| %>
-  g.data("<%= type.to_s.humanize %>", [<%= @spot_activities.collect(&type).join(',') %>]);
+  <% [:accel,:accelx,:accely,:accelz,:rel_accel,:rel_accelx,:rel_accely,:rel_accelz].each do |type| %>
+      g.data("<%= type.to_s.humanize %>", [<%= @spot_activities.collect(&type).join(',') %>]);
   <% end %>
 
 
-  //g.labels = {0: '2003', 2: '2004', 4: '2005'};
+    //g.labels = {0: '2003', 2: '2004', 4: '2005'};
 
-  g.draw();
-</script>
+    g.draw();
+  </script>
+<% end %>
 
 <table>
   <tr>
