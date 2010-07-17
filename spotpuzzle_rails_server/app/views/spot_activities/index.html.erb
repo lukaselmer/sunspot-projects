@@ -1,10 +1,10 @@
 <h1>Listing spot activities</h1>
 
 <% @spot_activities_by_address.each do |address, sas| %>
-  <canvas id="<%=h address %>_chart" width="1600" height="1000"></canvas>
+  <canvas id="<%=h address %>_chart" width="1600" height="900"></canvas>
 
   <script type="text/javascript">
-    var g = new Bluff.Line('<%=h address %>_chart', '1600x1000');
+    var g = new Bluff.Line('<%=h address %>_chart', '1600x900');
     g.title = 'Acceleration for <%=h address %>';
     g.tooltips = true;
     g.dot_radius = 2;
