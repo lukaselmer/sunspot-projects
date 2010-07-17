@@ -89,6 +89,7 @@ public class StartApplication extends MIDlet {
     private Thread resultTransmitterThread;
     private ResultTransmitter resultTransmitter;
     private static Random random = new Random();
+    private ShuffleListener shuffleListener;
 //    private SpotActivitySender spotActivitySender;
 //    private Thread spotActivitySenderThread;
 
@@ -109,6 +110,7 @@ public class StartApplication extends MIDlet {
 //        spotActivitySenderThread = new Thread(spotActivitySender);
 //        spotActivitySenderThread.start();
 
+
         setupPuzzle(puzzle);
         setupPuzzle(reference);
 
@@ -124,8 +126,13 @@ public class StartApplication extends MIDlet {
         showSolutionListenerThread = new Thread(showSolutionListener);
         showSolutionListenerThread.start();
 
-        randomize();
+        shuffle();
+
+        shuffleListener = new ShuffleListener(this);
+        shuffleListener.start();
+
         playGame();
+
     }
 
     /**
@@ -144,13 +151,12 @@ public class StartApplication extends MIDlet {
         updateLeds(0);
     }
 
-    /**
-     * Shuffles the puzzle by performing a series of random moves.
-     * These are the same moves the player can make, so the puzzle
-     * is solvable.
-     */
-    private void randomize() {
-        for (int t = 0; t < 32; t++) {
+    public void shuffle() {
+        shuffle(32);
+    }
+
+    public void shuffle(int times) {
+        for (int t = 0; t < times; t++) {
             swap(random.nextInt(8), random.nextInt(8));
             updateLeds();
         }
@@ -232,7 +238,7 @@ public class StartApplication extends MIDlet {
         swapTimes = 0;
         cycleTimes = 0;
         resumeApp();
-        randomize();
+        shuffle();
     }
 
     /**
@@ -240,8 +246,18 @@ public class StartApplication extends MIDlet {
      * @return true if the puzzle is solved.
      */
     private boolean isSolved() {
+        boolean solved = true;
         for (int t = 0; t < puzzle.length; t++) {
             if (!puzzle[t].equals(reference[t])) {
+                solved = false;
+                break;
+            }
+        }
+        if (solved) {
+            return true;
+        }
+        for (int t = 0; t < puzzle.length; t++) {
+            if (!puzzle[t].equals(reference[puzzle.length - t - 1])) {
                 return false;
             }
         }
