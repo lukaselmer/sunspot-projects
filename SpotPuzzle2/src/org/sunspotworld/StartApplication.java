@@ -89,8 +89,8 @@ public class StartApplication extends MIDlet {
     private Thread resultTransmitterThread;
     private ResultTransmitter resultTransmitter;
     private static Random random = new Random();
-    private SpotActivitySender spotActivitySender;
-    private Thread spotActivitySenderThread;
+//    private SpotActivitySender spotActivitySender;
+//    private Thread spotActivitySenderThread;
 
     /**
      * MIDlet call to start the application.
@@ -105,9 +105,9 @@ public class StartApplication extends MIDlet {
 //            resultTransmitter.addStatistics(50 + random.nextInt(150), 50 + random.nextInt(150), i);
 //        }
 
-        spotActivitySender = new SpotActivitySender();
-        spotActivitySenderThread = new Thread(spotActivitySender);
-        spotActivitySenderThread.start();
+//        spotActivitySender = new SpotActivitySender();
+//        spotActivitySenderThread = new Thread(spotActivitySender);
+//        spotActivitySenderThread.start();
 
         setupPuzzle(puzzle);
         setupPuzzle(reference);
